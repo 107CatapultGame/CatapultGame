@@ -1,7 +1,5 @@
 #include "MainpageScene.h"
 
-USING_NS_CC;
-
 cocos2d::Scene * Mainpage::createScene() {
     // 'scene' is an autorelease object
     auto scene = Scene::create();
@@ -24,59 +22,123 @@ bool Mainpage::init() {
         return false;
     }
 
-    auto visibleSize = Director::getInstance()->getVisibleSize();
-    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+    visibleSize = Director::getInstance()->getVisibleSize();
+    origin = Director::getInstance()->getVisibleOrigin();
 
-    /////////////////////////////
-    // 2. add a menu item with "X" image, which is clicked to quit the program
-    //    you may modify it.
-
-    // add a "close" icon to exit the progress. it's an autorelease object
-    auto closeItem = MenuItemImage::create(
-        "CloseNormal.png",
-        "CloseSelected.png",
-        CC_CALLBACK_1(Mainpage::menuCloseCallback, this));
-
-    closeItem->setPosition(Vec2(origin.x + visibleSize.width - closeItem->getContentSize().width / 2,
-        origin.y + closeItem->getContentSize().height / 2));
-
-    // create menu, it's an autorelease object
-    auto menu = Menu::create(closeItem, NULL);
-    menu->setPosition(Vec2::ZERO);
-    this->addChild(menu, 1);
-
-    /////////////////////////////
-    // 3. add your codes below...
-
-    // add a label shows "Hello World"
-    // create and initialize a label
-
-    auto label = Label::createWithTTF("Hello World", "fonts/Marker Felt.ttf", 24);
-
-    // position the label on the center of the screen
-    label->setPosition(Vec2(origin.x + visibleSize.width / 2,
-        origin.y + visibleSize.height - label->getContentSize().height));
-
-    // add the label as a child to this layer
-    this->addChild(label, 1);
-
-    // add "HelloWorld" splash screen"
-    auto sprite = Sprite::create("HelloWorld.png");
-
-    // position the sprite on the center of the screen
-    sprite->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
-
-    // add the sprite as a child to this layer
-    this->addChild(sprite, 0);
+    addBackground(); // 添加背景
+    addMenu(); // 添加菜单
+    addUI(); // 添加UI
 
     return true;
 }
 
+void Mainpage::addBackground() {
+    // 添加背景
+    auto background = Sprite::create("images/mainpage/background.png");
+    // 位置设置为屏幕中心
+    background->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
+    // 加入场景
+    this->addChild(background, Global::LAYER_BACKGROUND);
+}
 
-void Mainpage::menuCloseCallback(Ref* pSender) {
-    Director::getInstance()->end();
+void Mainpage::addMenu() {
+    // 设置两个按钮之间的垂直间隔
+    const float verticalSpace = 20;
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-    exit(0);
-#endif
+    // 开始游戏
+    auto startItem = MenuItemImage::create();
+    startItem->setNormalImage(Sprite::create("images/mainpage/start.png"));
+    startItem->setPosition(Vec2(startItem->getContentSize().width / 2 + origin.x + 20,
+        visibleSize.height + origin.y - startItem->getContentSize().height / 2 - 100));
+    startItem->setCallback(CC_CALLBACK_1(Mainpage::menuStartCallback, this));
+    // 物品栏
+    auto inventoryItem = MenuItemImage::create();
+    inventoryItem->setNormalImage(Sprite::create("images/mainpage/inventory.png"));
+    inventoryItem->setPosition(Vec2(startItem->getPosition().x,
+        startItem->getPosition().y - inventoryItem->getContentSize().height - verticalSpace));
+    inventoryItem->setCallback(CC_CALLBACK_1(Mainpage::menuInventoryCallback, this));
+    // 强化系统
+    auto strengthenItem = MenuItemImage::create();
+    strengthenItem->setNormalImage(Sprite::create("images/mainpage/strengthen.png"));
+    strengthenItem->setPosition(Vec2(inventoryItem->getPosition().x,
+        inventoryItem->getPosition().y - strengthenItem->getContentSize().height - verticalSpace));
+    strengthenItem->setCallback(CC_CALLBACK_1(Mainpage::menuStrengthenCallback, this));
+    // 商店
+    auto storeItem = MenuItemImage::create();
+    storeItem->setNormalImage(Sprite::create("images/mainpage/store.png"));
+    storeItem->setPosition(Vec2(strengthenItem->getPosition().x,
+        strengthenItem->getPosition().y - storeItem->getContentSize().height - verticalSpace));
+    storeItem->setCallback(CC_CALLBACK_1(Mainpage::menuStoreCallback, this));
+    // 设置
+    auto settingsItem = MenuItemImage::create();
+    settingsItem->setNormalImage(Sprite::create("images/mainpage/settings.png"));
+    settingsItem->setPosition(Vec2(storeItem->getPosition().x,
+        storeItem->getPosition().y - settingsItem->getContentSize().height - verticalSpace * 4));
+    settingsItem->setCallback(CC_CALLBACK_1(Mainpage::menuSettingsCallback, this));
+
+    // create menu, it's an autorelease object
+    auto menu = Menu::create(startItem, inventoryItem, strengthenItem, storeItem, settingsItem, NULL);
+    menu->setPosition(Vec2::ZERO);
+    this->addChild(menu, Global::LAYER_UI);
+}
+
+void Mainpage::addUI() {
+    // 设置两个按钮之间的垂直间隔
+    const float verticalSpace = 20;
+
+    // 积分-设置一个sprite作为背景图, 一个Label显示文字
+    auto scoreBg = Sprite::create("images/mainpage/score.png");
+    scoreBg->setPosition(Vec2(origin.x + visibleSize.width - scoreBg->getContentSize().width / 2 - 20,
+        visibleSize.height + origin.y - scoreBg->getContentSize().height / 2 - 120));
+    scoreLabel = Label::create("score", "fonts/arial.ttf", 20);
+    scoreLabel->setPosition(scoreBg->getPosition());
+    this->addChild(scoreBg, Global::LAYER_UI);
+    this->addChild(scoreLabel, Global::LAYER_UI + 1); // 文字层比背景图层高一级
+
+    // 金币-设置一个sprite作为背景图, 一个Label显示文字
+    auto goldBg = Sprite::create("images/mainpage/gold.png");
+    goldBg->setPosition(Vec2(scoreBg->getPosition().x,
+        scoreBg->getPosition().y - goldBg->getContentSize().height - verticalSpace));
+    goldLabel = Label::create("gold", "fonts/arial.ttf", 20);
+    goldLabel->setPosition(goldBg->getPosition());
+    this->addChild(goldBg, Global::LAYER_UI);
+    this->addChild(goldLabel, Global::LAYER_UI + 1); // 文字层比背景图层高一级
+
+    // 时间-设置一个sprite作为背景图, 一个Label显示文字
+    auto timeBg = Sprite::create("images/mainpage/time.png");
+    timeBg->setPosition(Vec2(origin.x + visibleSize.width - timeBg->getContentSize().width / 2 - 20,
+        origin.y + timeBg->getContentSize().height / 2 + verticalSpace));
+    timeLabel = Label::create(Global::getSystemTime(), "fonts/arial.ttf", 20);
+    timeLabel->setPosition(timeBg->getPosition());
+    this->addChild(timeBg, Global::LAYER_UI);
+    this->addChild(timeLabel, Global::LAYER_UI + 1); // 文字层比背景图层高一级
+
+    // 用户名-设置一个sprite作为背景图, 一个Label显示文字
+    auto usernameBg = Sprite::create("images/mainpage/username.png");
+    usernameBg->setPosition(Vec2(origin.x + visibleSize.width / 2,
+        origin.y + usernameBg->getContentSize().height / 2 + verticalSpace));
+    usernameLabel = Label::create("username", "fonts/arial.ttf", 20);
+    usernameLabel->setPosition(usernameBg->getPosition());
+    this->addChild(usernameBg, Global::LAYER_UI);
+    this->addChild(usernameLabel, Global::LAYER_UI + 1); // 文字层比背景图层高一级
+}
+
+void Mainpage::menuStartCallback(cocos2d::Ref* pSender) {
+    cocos2d::log("start"); // test
+}
+
+void Mainpage::menuInventoryCallback(cocos2d::Ref* pSender) {
+    cocos2d::log("inventory"); // test
+}
+
+void Mainpage::menuStrengthenCallback(cocos2d::Ref* pSender) {
+    cocos2d::log("strengthen"); // test
+}
+
+void Mainpage::menuStoreCallback(cocos2d::Ref* pSender) {
+    cocos2d::log("store"); // test
+}
+
+void Mainpage::menuSettingsCallback(cocos2d::Ref* pSender) {
+    cocos2d::log("setting"); // test
 }

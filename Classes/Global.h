@@ -8,13 +8,13 @@ class Global {
     public:
     Global();
     ~Global();
-    /** »ñÈ¡µ±Ç°Ê±¼ä, ¸ñÊ½hh:mm */
+    /** è·å–å½“å‰æ—¶é—´, æ ¼å¼hh:mm */
     static std::string getSystemTime();
 
-    // ÓÃÒÔÖ¸¶¨SpriteµÄ²ã¼¶
-    const static uint_8 LAYER_BACKGROUND; // ±³¾°²ã
-    const static uint_8 LAYER_GAMEPLAY;   // ÓÎÏ·²ã
-    const static uint_8 LAYER_UI;         // ½çÃæ²ã
+    // ç”¨ä»¥æŒ‡å®šSpriteçš„å±‚çº§
+    const static uint_8 LAYER_BACKGROUND; // èƒŒæ™¯å±‚
+    const static uint_8 LAYER_GAMEPLAY;   // æ¸¸æˆå±‚
+    const static uint_8 LAYER_UI;         // ç•Œé¢å±‚
 };
 
 #endif // __GLOBAL_SCENE_H__

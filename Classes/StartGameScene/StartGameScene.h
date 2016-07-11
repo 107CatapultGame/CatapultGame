@@ -4,7 +4,7 @@
 #include "cocos2d.h"
 
 class StartGame : public cocos2d::Layer {
-  public:
+    public:
     static cocos2d::Scene* createScene();
 
     virtual bool init();
@@ -13,12 +13,12 @@ class StartGame : public cocos2d::Layer {
     CREATE_FUNC(StartGame);
 
     private:
-    // ¸¨Öúº¯Êı
-    /** Îª³¡¾°Ìí¼Ó±³¾° */
+    // è¾…åŠ©å‡½æ•°
+    /** ä¸ºåœºæ™¯æ·»åŠ èƒŒæ™¯ */
     void addBackground();
-    /** Îª³¡¾°Ìí¼Ó²Ëµ¥ */
+    /** ä¸ºåœºæ™¯æ·»åŠ èœå• */
     void addMenu();
-    /** Îª³¡¾°Ìí¼ÓUIÔªËØ */
+    /** ä¸ºåœºæ™¯æ·»åŠ UIå…ƒç´  */
     void addUI();
     // selector callback functions
     void menuSingleCallback(cocos2d::Ref* pSender);
@@ -28,10 +28,10 @@ class StartGame : public cocos2d::Layer {
     // scheduler
     void updateTime(float f);
 
-    cocos2d::Size visibleSize; // ´°Ìå³ß´ç
-    cocos2d::Vec2 origin; // Æğµã×ø±ê
-    // ÎÄ×ÖLabel
-    cocos2d::Label * timeLabel; // Ê±¼ä
+    cocos2d::Size visibleSize; // çª—ä½“å°ºå¯¸
+    cocos2d::Vec2 origin; // èµ·ç‚¹åæ ‡
+                          // æ–‡å­—Label
+    cocos2d::Label * timeLabel; // æ—¶é—´
 };
 
 #endif // __STARTGAME_SCENE_H__

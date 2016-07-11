@@ -4,25 +4,25 @@
 #include "cocos2d.h"
 
 class Mainpage : public cocos2d::Layer {
-    public:
+  public:
     static cocos2d::Scene* createScene();
     virtual bool init();
     // implement the "static create()" method manually
     CREATE_FUNC(Mainpage);
 
-    private:
-    // ¸¨Öúº¯Êı
-    /** Îª³¡¾°Ìí¼Ó±³¾° */
+  private:
+    // è¾…åŠ©å‡½æ•°
+    /** ä¸ºåœºæ™¯æ·»åŠ èƒŒæ™¯ */
     void addBackground();
-    /** Îª³¡¾°Ìí¼Ó²Ëµ¥ */
+    /** ä¸ºåœºæ™¯æ·»åŠ èœå• */
     void addMenu();
-    /** Îª³¡¾°Ìí¼ÓUIÔªËØ */
+    /** ä¸ºåœºæ™¯æ·»åŠ UIå…ƒç´  */
     void addUI();
-    /** Ô¤ÔØBGM */
+    /** é¢„è½½BGM */
     void preloadBGM();
-    /** ²¥·ÅBGM */
+    /** æ’­æ”¾BGM */
     void playBGM();
-    /** ÇĞ»»³¡¾°¸¨Öúº¯Êı */
+    /** åˆ‡æ¢åœºæ™¯è¾…åŠ©å‡½æ•° */
     void switchScene();
     // scheduler
     void updateTime(float f);
@@ -33,13 +33,13 @@ class Mainpage : public cocos2d::Layer {
     void menuStoreCallback(cocos2d::Ref* pSender);
     void menuSettingsCallback(cocos2d::Ref* pSender);
 
-    cocos2d::Size visibleSize; // ´°Ìå³ß´ç
-    cocos2d::Vec2 origin; // Æğµã×ø±ê
-    // ¼¸¸öÎÄ×ÖLabel
-    cocos2d::Label * scoreLabel; // »ı·Ö
-    cocos2d::Label * goldLabel; // ½ğ±Ò
-    cocos2d::Label * timeLabel; // Ê±¼ä
-    cocos2d::Label * usernameLabel; // ÓÃ»§Ãû
+    cocos2d::Size visibleSize; // çª—ä½“å°ºå¯¸
+    cocos2d::Vec2 origin; // èµ·ç‚¹åæ ‡
+    // å‡ ä¸ªæ–‡å­—Label
+    cocos2d::Label * scoreLabel; // ç§¯åˆ†
+    cocos2d::Label * goldLabel; // é‡‘å¸
+    cocos2d::Label * timeLabel; // æ—¶é—´
+    cocos2d::Label * usernameLabel; // ç”¨æˆ·å
 };
 
 #endif // __MAINPAGE_SCENE_H__

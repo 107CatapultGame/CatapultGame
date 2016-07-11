@@ -27,25 +27,25 @@ bool StartGame::init() {
     visibleSize = Director::getInstance()->getVisibleSize();
     origin = Director::getInstance()->getVisibleOrigin();
 
-    addBackground(); // Ìí¼Ó±³¾°
-    addMenu(); // Ìí¼Ó²Ëµ¥
-    addUI(); // Ìí¼ÓUI
-    // Ã¿·ÖÖÓ¸üÐÂÒ»´ÎÊ±¼ä
+    addBackground(); // æ·»åŠ èƒŒæ™¯
+    addMenu(); // æ·»åŠ èœå•
+    addUI(); // æ·»åŠ UI
+             // æ¯åˆ†é’Ÿæ›´æ–°ä¸€æ¬¡æ—¶é—´
     this->schedule(schedule_selector(StartGame::updateTime), 60.0f);
     return true;
 }
 
 void StartGame::addBackground() {
-    // Ìí¼Ó±³¾°
+    // æ·»åŠ èƒŒæ™¯
     auto background = Sprite::create("images/startgame/background.png");
-    // Î»ÖÃÉèÖÃÎªÆÁÄ»ÖÐÐÄ
+    // ä½ç½®è®¾ç½®ä¸ºå±å¹•ä¸­å¿ƒ
     background->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
-    // ¼ÓÈë³¡¾°
+    // åŠ å…¥åœºæ™¯
     this->addChild(background, Global::LAYER_BACKGROUND);
 }
 
 void StartGame::addMenu() {
-    // ·µ»Ø
+    // è¿”å›ž
     auto returnItem = MenuItemImage::create(
         "images/startgame/return_normal.png",
         "images/startgame/return_selected.png",
@@ -53,7 +53,7 @@ void StartGame::addMenu() {
         );
     returnItem->setPosition(Vec2(origin.x + returnItem->getContentSize().width / 2 + 20,
         origin.x + visibleSize.height - returnItem->getContentSize().height / 2 - 20));
-    // ºÏ×÷, ÆÁÄ»ÖÐ¼ä
+    // åˆä½œ, å±å¹•ä¸­é—´
     auto coopItem = MenuItemImage::create(
         "images/startgame/coop_normal.png",
         "images/startgame/coop_selected.png",
@@ -61,9 +61,9 @@ void StartGame::addMenu() {
         );
     coopItem->setPosition(Vec2(origin.x + visibleSize.width / 2,
         origin.x + visibleSize.height / 2));
-    // ÉèÖÃÁ½¸ö°´Å¥Ö®¼äµÄË®Æ½¼ä¸ô
+    // è®¾ç½®ä¸¤ä¸ªæŒ‰é’®ä¹‹é—´çš„æ°´å¹³é—´éš”
     const float horizonalSpace = 20 + coopItem->getContentSize().width;
-    // µ¥ÈËÓÎÏ·, ºÏ×÷×ó±ß
+    // å•äººæ¸¸æˆ, åˆä½œå·¦è¾¹
     auto singleItem = MenuItemImage::create(
         "images/startgame/single_normal.png",
         "images/startgame/single_selected.png",
@@ -71,7 +71,7 @@ void StartGame::addMenu() {
         );
     singleItem->setPosition(Vec2(coopItem->getPosition().x - horizonalSpace,
         coopItem->getPosition().y));
-    // ¶ÔÕ½, ºÏ×÷ÓÒ±ß
+    // å¯¹æˆ˜, åˆä½œå³è¾¹
     auto battleItem = MenuItemImage::create(
         "images/startgame/battle_normal.png",
         "images/startgame/battle_selected.png",
@@ -87,14 +87,14 @@ void StartGame::addMenu() {
 }
 
 void StartGame::addUI() {
-    // Ê±¼ä-ÉèÖÃÒ»¸ösprite×÷Îª±³¾°Í¼, Ò»¸öLabelÏÔÊ¾ÎÄ×Ö
+    // æ—¶é—´-è®¾ç½®ä¸€ä¸ªspriteä½œä¸ºèƒŒæ™¯å›¾, ä¸€ä¸ªLabelæ˜¾ç¤ºæ–‡å­—
     auto timeBg = Sprite::create("images/startgame/time.png");
     timeBg->setPosition(Vec2(origin.x + visibleSize.width - timeBg->getContentSize().width / 2 - 20,
         origin.y + timeBg->getContentSize().height / 2 + 20));
     timeLabel = Label::create(Global::getSystemTime(), "fonts/arial.ttf", 20);
     timeLabel->setPosition(timeBg->getPosition());
     this->addChild(timeBg, Global::LAYER_UI);
-    this->addChild(timeLabel, Global::LAYER_UI + 1); // ÎÄ×Ö²ã±È±³¾°Í¼²ã¸ßÒ»¼¶
+    this->addChild(timeLabel, Global::LAYER_UI + 1); // æ–‡å­—å±‚æ¯”èƒŒæ™¯å›¾å±‚é«˜ä¸€çº§
 }
 
 void StartGame::menuSingleCallback(cocos2d::Ref * pSender) {
@@ -111,16 +111,16 @@ void StartGame::menuBattleCallback(cocos2d::Ref * pSender) {
 
 void StartGame::menuReturnCallback(cocos2d::Ref * pSender) {
     cocos2d::log("return"); // test
-    //// ±¾³¡¾°³öÕ»²¢ÇÐ»»µ½ÉÏ¸ö³¡¾°
-    //Director::getInstance()->popScene();
-    this->unscheduleAllSelectors(); // Í£Ö¹ËùÓÐµ÷¶È
-    // ´´½¨³¡¾°
+                            //// æœ¬åœºæ™¯å‡ºæ ˆå¹¶åˆ‡æ¢åˆ°ä¸Šä¸ªåœºæ™¯
+                            //Director::getInstance()->popScene();
+    this->unscheduleAllSelectors(); // åœæ­¢æ‰€æœ‰è°ƒåº¦
+                                    // åˆ›å»ºåœºæ™¯
     auto MainScene = Mainpage::createScene();
-    // ÇÐ»»³¡¾°
+    // åˆ‡æ¢åœºæ™¯
     Director::getInstance()->replaceScene(TransitionSlideInR::create(0.5f, MainScene));
 }
 
 void StartGame::updateTime(float f) {
-    // ¸üÐÂÊ±¼ä
+    // æ›´æ–°æ—¶é—´
     timeLabel->setString(Global::getSystemTime());
 }

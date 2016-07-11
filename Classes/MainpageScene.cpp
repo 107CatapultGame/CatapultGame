@@ -31,56 +31,56 @@ bool Mainpage::init() {
     visibleSize = Director::getInstance()->getVisibleSize();
     origin = Director::getInstance()->getVisibleOrigin();
 
-    preloadBGM(); // Ô¤ÔØÈëBGM
-    addBackground(); // Ìí¼Ó±³¾°
-    addMenu(); // Ìí¼Ó²Ëµ¥
-    addUI(); // Ìí¼ÓUI
-    // ²¥·Åbgm
+    preloadBGM(); // é¢„è½½å…¥BGM
+    addBackground(); // æ·»åŠ èƒŒæ™¯
+    addMenu(); // æ·»åŠ èœå•
+    addUI(); // æ·»åŠ UI
+    // æ’­æ”¾bgm
     CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("musics/main_bgm.mp3", true);
 
-    // Ã¿·ÖÖÓ¸üÐÂÒ»´ÎÊ±¼ä
+    // æ¯åˆ†é’Ÿæ›´æ–°ä¸€æ¬¡æ—¶é—´
     this->schedule(schedule_selector(Mainpage::updateTime), 60.0f);
     return true;
 }
 
 void Mainpage::addBackground() {
-    // Ìí¼Ó±³¾°
+    // æ·»åŠ èƒŒæ™¯
     auto background = Sprite::create("images/mainpage/background.png");
-    // Î»ÖÃÉèÖÃÎªÆÁÄ»ÖÐÐÄ
+    // ä½ç½®è®¾ç½®ä¸ºå±å¹•ä¸­å¿ƒ
     background->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
-    // ¼ÓÈë³¡¾°
+    // åŠ å…¥åœºæ™¯
     this->addChild(background, Global::LAYER_BACKGROUND);
 }
 
 void Mainpage::addMenu() {
-    // ÉèÖÃÁ½¸ö°´Å¥Ö®¼äµÄ´¹Ö±¼ä¸ô
+    // è®¾ç½®ä¸¤ä¸ªæŒ‰é’®ä¹‹é—´çš„åž‚ç›´é—´éš”
     const float verticalSpace = 20;
 
-    // ¿ªÊ¼ÓÎÏ·
+    // å¼€å§‹æ¸¸æˆ
     auto startItem = MenuItemImage::create();
     startItem->setNormalImage(Sprite::create("images/mainpage/start.png"));
     startItem->setPosition(Vec2(startItem->getContentSize().width / 2 + origin.x + 20,
         visibleSize.height + origin.y - startItem->getContentSize().height / 2 - 100));
     startItem->setCallback(CC_CALLBACK_1(Mainpage::menuStartCallback, this));
-    // ÎïÆ·À¸
+    // ç‰©å“æ 
     auto inventoryItem = MenuItemImage::create();
     inventoryItem->setNormalImage(Sprite::create("images/mainpage/inventory.png"));
     inventoryItem->setPosition(Vec2(startItem->getPosition().x,
         startItem->getPosition().y - inventoryItem->getContentSize().height - verticalSpace));
     inventoryItem->setCallback(CC_CALLBACK_1(Mainpage::menuInventoryCallback, this));
-    // Ç¿»¯ÏµÍ³
+    // å¼ºåŒ–ç³»ç»Ÿ
     auto strengthenItem = MenuItemImage::create();
     strengthenItem->setNormalImage(Sprite::create("images/mainpage/strengthen.png"));
     strengthenItem->setPosition(Vec2(inventoryItem->getPosition().x,
         inventoryItem->getPosition().y - strengthenItem->getContentSize().height - verticalSpace));
     strengthenItem->setCallback(CC_CALLBACK_1(Mainpage::menuStrengthenCallback, this));
-    // ÉÌµê
+    // å•†åº—
     auto storeItem = MenuItemImage::create();
     storeItem->setNormalImage(Sprite::create("images/mainpage/store.png"));
     storeItem->setPosition(Vec2(strengthenItem->getPosition().x,
         strengthenItem->getPosition().y - storeItem->getContentSize().height - verticalSpace));
     storeItem->setCallback(CC_CALLBACK_1(Mainpage::menuStoreCallback, this));
-    // ÉèÖÃ
+    // è®¾ç½®
     auto settingsItem = MenuItemImage::create(
         "images/mainpage/settings_normal.png",
         "images/mainpage/settings_selected.png",
@@ -96,44 +96,44 @@ void Mainpage::addMenu() {
 }
 
 void Mainpage::addUI() {
-    // ÉèÖÃÁ½¸ö°´Å¥Ö®¼äµÄ´¹Ö±¼ä¸ô
+    // è®¾ç½®ä¸¤ä¸ªæŒ‰é’®ä¹‹é—´çš„åž‚ç›´é—´éš”
     const float verticalSpace = 20;
 
-    // »ý·Ö-ÉèÖÃÒ»¸ösprite×÷Îª±³¾°Í¼, Ò»¸öLabelÏÔÊ¾ÎÄ×Ö
+    // ç§¯åˆ†-è®¾ç½®ä¸€ä¸ªspriteä½œä¸ºèƒŒæ™¯å›¾, ä¸€ä¸ªLabelæ˜¾ç¤ºæ–‡å­—
     auto scoreBg = Sprite::create("images/mainpage/score.png");
     scoreBg->setPosition(Vec2(origin.x + visibleSize.width - scoreBg->getContentSize().width / 2 - 20,
         visibleSize.height + origin.y - scoreBg->getContentSize().height / 2 - 120));
     scoreLabel = Label::create("score", "fonts/arial.ttf", 20);
     scoreLabel->setPosition(scoreBg->getPosition());
     this->addChild(scoreBg, Global::LAYER_UI);
-    this->addChild(scoreLabel, Global::LAYER_UI + 1); // ÎÄ×Ö²ã±È±³¾°Í¼²ã¸ßÒ»¼¶
+    this->addChild(scoreLabel, Global::LAYER_UI + 1); // æ–‡å­—å±‚æ¯”èƒŒæ™¯å›¾å±‚é«˜ä¸€çº§
 
-    // ½ð±Ò-ÉèÖÃÒ»¸ösprite×÷Îª±³¾°Í¼, Ò»¸öLabelÏÔÊ¾ÎÄ×Ö
+    // é‡‘å¸-è®¾ç½®ä¸€ä¸ªspriteä½œä¸ºèƒŒæ™¯å›¾, ä¸€ä¸ªLabelæ˜¾ç¤ºæ–‡å­—
     auto goldBg = Sprite::create("images/mainpage/gold.png");
     goldBg->setPosition(Vec2(scoreBg->getPosition().x,
         scoreBg->getPosition().y - goldBg->getContentSize().height - verticalSpace));
     goldLabel = Label::create("gold", "fonts/arial.ttf", 20);
     goldLabel->setPosition(goldBg->getPosition());
     this->addChild(goldBg, Global::LAYER_UI);
-    this->addChild(goldLabel, Global::LAYER_UI + 1); // ÎÄ×Ö²ã±È±³¾°Í¼²ã¸ßÒ»¼¶
+    this->addChild(goldLabel, Global::LAYER_UI + 1); // æ–‡å­—å±‚æ¯”èƒŒæ™¯å›¾å±‚é«˜ä¸€çº§
 
-    // Ê±¼ä-ÉèÖÃÒ»¸ösprite×÷Îª±³¾°Í¼, Ò»¸öLabelÏÔÊ¾ÎÄ×Ö
+    // æ—¶é—´-è®¾ç½®ä¸€ä¸ªspriteä½œä¸ºèƒŒæ™¯å›¾, ä¸€ä¸ªLabelæ˜¾ç¤ºæ–‡å­—
     auto timeBg = Sprite::create("images/mainpage/time.png");
     timeBg->setPosition(Vec2(origin.x + visibleSize.width - timeBg->getContentSize().width / 2 - 20,
         origin.y + timeBg->getContentSize().height / 2 + verticalSpace));
     timeLabel = Label::create(Global::getSystemTime(), "fonts/arial.ttf", 20);
     timeLabel->setPosition(timeBg->getPosition());
     this->addChild(timeBg, Global::LAYER_UI);
-    this->addChild(timeLabel, Global::LAYER_UI + 1); // ÎÄ×Ö²ã±È±³¾°Í¼²ã¸ßÒ»¼¶
+    this->addChild(timeLabel, Global::LAYER_UI + 1); // æ–‡å­—å±‚æ¯”èƒŒæ™¯å›¾å±‚é«˜ä¸€çº§
 
-    // ÓÃ»§Ãû-ÉèÖÃÒ»¸ösprite×÷Îª±³¾°Í¼, Ò»¸öLabelÏÔÊ¾ÎÄ×Ö
+    // ç”¨æˆ·å-è®¾ç½®ä¸€ä¸ªspriteä½œä¸ºèƒŒæ™¯å›¾, ä¸€ä¸ªLabelæ˜¾ç¤ºæ–‡å­—
     auto usernameBg = Sprite::create("images/mainpage/username.png");
     usernameBg->setPosition(Vec2(origin.x + visibleSize.width / 2,
         origin.y + usernameBg->getContentSize().height / 2 + verticalSpace));
     usernameLabel = Label::create("username", "fonts/arial.ttf", 20);
     usernameLabel->setPosition(usernameBg->getPosition());
     this->addChild(usernameBg, Global::LAYER_UI);
-    this->addChild(usernameLabel, Global::LAYER_UI + 1); // ÎÄ×Ö²ã±È±³¾°Í¼²ã¸ßÒ»¼¶
+    this->addChild(usernameLabel, Global::LAYER_UI + 1); // æ–‡å­—å±‚æ¯”èƒŒæ™¯å›¾å±‚é«˜ä¸€çº§
 }
 
 void Mainpage::preloadBGM() {
@@ -148,21 +148,21 @@ void Mainpage::playBGM() {
 }
 
 void Mainpage::switchScene() {
-    unscheduleAllSelectors(); // Í£Ö¹µ÷¶ÈÆ÷
+    unscheduleAllSelectors(); // åœæ­¢è°ƒåº¦å™¨
     CocosDenshion::SimpleAudioEngine::getInstance()->stopBackgroundMusic();
 }
 
 void Mainpage::updateTime(float f) {
-    // ¸üÐÂÊ±¼ä
+    // æ›´æ–°æ—¶é—´
     timeLabel->setString(Global::getSystemTime());
 }
 
 void Mainpage::menuStartCallback(cocos2d::Ref* pSender) {
     cocos2d::log("start"); // test
     switchScene();
-    // ´´½¨ÐÂ³¡¾°
+    // åˆ›å»ºæ–°åœºæ™¯
     auto StartScene = StartGame::createScene();
-    // ÌØÐ§ÇÐ»»³¡¾°
+    // ç‰¹æ•ˆåˆ‡æ¢åœºæ™¯
     Director::getInstance()->replaceScene(TransitionSlideInL::create(0.5f, StartScene));
 }
 

@@ -13,9 +13,9 @@ Global::~Global() {}
 std::string Global::getSystemTime() {
     std::string result = "";
     char temp[20];
-    time_t now = time(NULL); // »ñÈ¡Ê±¼ä
-    struct tm * local = localtime(&now); // »ñÈ¡ÏµÍ³Ê±¼ä
-    strftime(temp, 20, "%H:%M", local); // ÉèÖÃÊ±¼ä¸ñÊ½Îªhh:mm
+    time_t now = time(NULL); // è·å–æ—¶é—´
+    struct tm * local = localtime(&now); // è·å–ç³»ç»Ÿæ—¶é—´
+    strftime(temp, 20, "%H:%M", local); // è®¾ç½®æ—¶é—´æ ¼å¼ä¸ºhh:mm
     result = temp;
-    return result; // ·µ»ØÖµ
+    return result; // è¿”å›å€¼
 }

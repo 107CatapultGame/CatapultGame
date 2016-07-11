@@ -20,14 +20,18 @@ class Mainpage : public cocos2d::Layer {
     void addUI();
     /** Ô¤ÔØBGM */
     void preloadBGM();
+    /** ²¥·ÅBGM */
+    void playBGM();
+    /** ÇÐ»»³¡¾°¸¨Öúº¯Êý */
+    void switchScene();
+    // scheduler
+    void updateTime(float f);
     // selector callback functions
     void menuStartCallback(cocos2d::Ref* pSender);
     void menuInventoryCallback(cocos2d::Ref* pSender);
     void menuStrengthenCallback(cocos2d::Ref* pSender);
     void menuStoreCallback(cocos2d::Ref* pSender);
     void menuSettingsCallback(cocos2d::Ref* pSender);
-    // scheduler
-    void updateTime(float f);
 
     cocos2d::Size visibleSize; // ´°Ìå³ß´ç
     cocos2d::Vec2 origin; // Æðµã×ø±ê

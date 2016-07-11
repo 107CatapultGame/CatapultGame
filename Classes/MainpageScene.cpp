@@ -140,12 +140,30 @@ void Mainpage::preloadBGM() {
     CocosDenshion::SimpleAudioEngine::getInstance()->preloadBackgroundMusic("musics/main_bgm.mp3");
 }
 
+void Mainpage::playBGM() {
+    auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+    if (!audio->isBackgroundMusicPlaying()) {
+        audio->playBackgroundMusic(("musics/main_bgm.mp3"));
+    }
+}
+
+void Mainpage::switchScene() {
+    unscheduleAllSelectors(); // 停止调度器
+    CocosDenshion::SimpleAudioEngine::getInstance()->stopBackgroundMusic();
+}
+
+void Mainpage::updateTime(float f) {
+    // 更新时间
+    timeLabel->setString(Global::getSystemTime());
+}
+
 void Mainpage::menuStartCallback(cocos2d::Ref* pSender) {
     cocos2d::log("start"); // test
+    switchScene();
     // 创建新场景
     auto StartScene = StartGame::createScene();
-    // 当前场景入栈并切换到新场景
-    Director::getInstance()->pushScene(StartScene);
+    // 特效切换场景
+    Director::getInstance()->replaceScene(TransitionSlideInL::create(0.5f, StartScene));
 }
 
 void Mainpage::menuInventoryCallback(cocos2d::Ref* pSender) {
@@ -162,9 +180,4 @@ void Mainpage::menuStoreCallback(cocos2d::Ref* pSender) {
 
 void Mainpage::menuSettingsCallback(cocos2d::Ref* pSender) {
     cocos2d::log("setting"); // test
-}
-
-void Mainpage::updateTime(float f) {
-    // 更新时间
-    timeLabel->setString(Global::getSystemTime());
 }

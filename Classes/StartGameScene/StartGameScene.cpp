@@ -1,5 +1,6 @@
-#include "Global.h"
+#include "../Global.h"
 #include "StartGameScene.h"
+#include "../MainpageScene.h"
 
 USING_NS_CC;
 
@@ -110,8 +111,13 @@ void StartGame::menuBattleCallback(cocos2d::Ref * pSender) {
 
 void StartGame::menuReturnCallback(cocos2d::Ref * pSender) {
     cocos2d::log("return"); // test
-    // 本场景出栈并切换到上个场景
-    Director::getInstance()->popScene();
+    //// 本场景出栈并切换到上个场景
+    //Director::getInstance()->popScene();
+    this->unscheduleAllSelectors(); // 停止所有调度
+    // 创建场景
+    auto MainScene = Mainpage::createScene();
+    // 切换场景
+    Director::getInstance()->replaceScene(TransitionSlideInR::create(0.5f, MainScene));
 }
 
 void StartGame::updateTime(float f) {

@@ -1,4 +1,10 @@
+#include "Global.h"
 #include "MainpageScene.h"
+#include "StartGameScene/StartGameScene.h"
+
+#include "SimpleAudioEngine.h"
+
+USING_NS_CC;
 
 cocos2d::Scene * Mainpage::createScene() {
     // 'scene' is an autorelease object
@@ -25,10 +31,15 @@ bool Mainpage::init() {
     visibleSize = Director::getInstance()->getVisibleSize();
     origin = Director::getInstance()->getVisibleOrigin();
 
+    preloadBGM(); // 预载入BGM
     addBackground(); // 添加背景
     addMenu(); // 添加菜单
     addUI(); // 添加UI
+    // 播放bgm
+    CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("musics/main_bgm.mp3", true);
 
+    // 每分钟更新一次时间
+    this->schedule(schedule_selector(Mainpage::updateTime), 60.0f);
     return true;
 }
 
@@ -70,11 +81,13 @@ void Mainpage::addMenu() {
         strengthenItem->getPosition().y - storeItem->getContentSize().height - verticalSpace));
     storeItem->setCallback(CC_CALLBACK_1(Mainpage::menuStoreCallback, this));
     // 设置
-    auto settingsItem = MenuItemImage::create();
-    settingsItem->setNormalImage(Sprite::create("images/mainpage/settings.png"));
+    auto settingsItem = MenuItemImage::create(
+        "images/mainpage/settings_normal.png",
+        "images/mainpage/settings_selected.png",
+        CC_CALLBACK_1(Mainpage::menuSettingsCallback, this)
+        );
     settingsItem->setPosition(Vec2(storeItem->getPosition().x,
         storeItem->getPosition().y - settingsItem->getContentSize().height - verticalSpace * 4));
-    settingsItem->setCallback(CC_CALLBACK_1(Mainpage::menuSettingsCallback, this));
 
     // create menu, it's an autorelease object
     auto menu = Menu::create(startItem, inventoryItem, strengthenItem, storeItem, settingsItem, NULL);
@@ -123,8 +136,16 @@ void Mainpage::addUI() {
     this->addChild(usernameLabel, Global::LAYER_UI + 1); // 文字层比背景图层高一级
 }
 
+void Mainpage::preloadBGM() {
+    CocosDenshion::SimpleAudioEngine::getInstance()->preloadBackgroundMusic("musics/main_bgm.mp3");
+}
+
 void Mainpage::menuStartCallback(cocos2d::Ref* pSender) {
     cocos2d::log("start"); // test
+    // 创建新场景
+    auto StartScene = StartGame::createScene();
+    // 当前场景入栈并切换到新场景
+    Director::getInstance()->pushScene(StartScene);
 }
 
 void Mainpage::menuInventoryCallback(cocos2d::Ref* pSender) {
@@ -141,4 +162,9 @@ void Mainpage::menuStoreCallback(cocos2d::Ref* pSender) {
 
 void Mainpage::menuSettingsCallback(cocos2d::Ref* pSender) {
     cocos2d::log("setting"); // test
+}
+
+void Mainpage::updateTime(float f) {
+    // 更新时间
+    timeLabel->setString(Global::getSystemTime());
 }

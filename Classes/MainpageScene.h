@@ -1,11 +1,7 @@
 #ifndef __MAINPAGE_SCENE_H__
 #define __MAINPAGE_SCENE_H__
 
-#include "Global.h"
-
 #include "cocos2d.h"
-
-USING_NS_CC;
 
 class Mainpage : public cocos2d::Layer {
     public:
@@ -22,20 +18,24 @@ class Mainpage : public cocos2d::Layer {
     void addMenu();
     /** 为场景添加UI元素 */
     void addUI();
+    /** 预载BGM */
+    void preloadBGM();
     // selector callback functions
     void menuStartCallback(cocos2d::Ref* pSender);
     void menuInventoryCallback(cocos2d::Ref* pSender);
     void menuStrengthenCallback(cocos2d::Ref* pSender);
     void menuStoreCallback(cocos2d::Ref* pSender);
     void menuSettingsCallback(cocos2d::Ref* pSender);
+    // scheduler
+    void updateTime(float f);
 
-    Size visibleSize; // 窗体尺寸
-    Vec2 origin; // 起点坐标
+    cocos2d::Size visibleSize; // 窗体尺寸
+    cocos2d::Vec2 origin; // 起点坐标
     // 几个文字Label
-    Label * scoreLabel; // 积分
-    Label * goldLabel; // 金币
-    Label * timeLabel; // 时间
-    Label * usernameLabel; // 用户名
+    cocos2d::Label * scoreLabel; // 积分
+    cocos2d::Label * goldLabel; // 金币
+    cocos2d::Label * timeLabel; // 时间
+    cocos2d::Label * usernameLabel; // 用户名
 };
 
 #endif // __MAINPAGE_SCENE_H__

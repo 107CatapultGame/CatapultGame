@@ -117,7 +117,7 @@ void SingleLevel::menuReturnCallback(cocos2d::Ref * pSender) {
 	// 创建场景
 	auto StartGameScene = StartGame::createScene();
 	// 切换场景
-	Director::getInstance()->replaceScene(TransitionSlideInR::create(0.5f, StartGameScene));
+	Director::getInstance()->replaceScene(TransitionSlideInL::create(0.25f, StartGameScene));
 }
 
 void SingleLevel::updateTime(float f) {

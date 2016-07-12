@@ -21,6 +21,9 @@ class StartGame : public cocos2d::Layer {
     /** 为场景添加UI元素 */
     void addUI();
     // selector callback functions
+
+	void switchScene();
+
     void menuSingleCallback(cocos2d::Ref* pSender);
     void menuCoopCallback(cocos2d::Ref* pSender);
     void menuBattleCallback(cocos2d::Ref* pSender);

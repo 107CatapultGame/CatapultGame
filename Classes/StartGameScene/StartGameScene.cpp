@@ -1,6 +1,7 @@
 #include "../Global.h"
 #include "StartGameScene.h"
 #include "../MainpageScene.h"
+#include "SingleLevelScene.h"
 
 USING_NS_CC;
 
@@ -31,7 +32,7 @@ bool StartGame::init() {
     addMenu(); // 添加菜单
     addUI(); // 添加UI
              // 每分钟更新一次时间
-    this->schedule(schedule_selector(StartGame::updateTime), 60.0f);
+    this->schedule(schedule_selector(StartGame::updateTime), 60.0f, kRepeatForever, 0);
     return true;
 }
 
@@ -97,8 +98,18 @@ void StartGame::addUI() {
     this->addChild(timeLabel, Global::LAYER_UI + 1); // 文字层比背景图层高一级
 }
 
+void StartGame::switchScene() {
+	unscheduleAllSelectors(); // 停止调度器
+	// CocosDenshion::SimpleAudioEngine::getInstance()->stopBackgroundMusic();
+}
+
 void StartGame::menuSingleCallback(cocos2d::Ref * pSender) {
     cocos2d::log("single"); // test
+	switchScene();
+	// 创建新场景
+	auto SingleLevelScene = SingleLevel::createScene();
+	// 特效切换场景
+	Director::getInstance()->replaceScene(TransitionSlideInR::create(0.25f, SingleLevelScene));
 }
 
 void StartGame::menuCoopCallback(cocos2d::Ref * pSender) {
@@ -117,7 +128,7 @@ void StartGame::menuReturnCallback(cocos2d::Ref * pSender) {
                                     // 创建场景
     auto MainScene = Mainpage::createScene();
     // 切换场景
-    Director::getInstance()->replaceScene(TransitionSlideInR::create(0.5f, MainScene));
+    Director::getInstance()->replaceScene(TransitionSlideInL::create(0.25f, MainScene));
 }
 
 void StartGame::updateTime(float f) {

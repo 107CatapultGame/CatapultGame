@@ -39,7 +39,7 @@ bool Mainpage::init() {
     CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("musics/main_bgm.mp3", true);
 
     // 每分钟更新一次时间
-    this->schedule(schedule_selector(Mainpage::updateTime), 60.0f);
+    this->schedule(schedule_selector(Mainpage::updateTime), 60.0f, kRepeatForever, 0);
     return true;
 }
 
@@ -163,7 +163,7 @@ void Mainpage::menuStartCallback(cocos2d::Ref* pSender) {
     // 创建新场景
     auto StartScene = StartGame::createScene();
     // 特效切换场景
-    Director::getInstance()->replaceScene(TransitionSlideInL::create(0.5f, StartScene));
+    Director::getInstance()->replaceScene(TransitionSlideInR::create(0.25f, StartScene));
 }
 
 void Mainpage::menuInventoryCallback(cocos2d::Ref* pSender) {

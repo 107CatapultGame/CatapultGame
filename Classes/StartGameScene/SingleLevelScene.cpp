@@ -1,6 +1,7 @@
 #include "../Global.h"
 #include "SingleLevelScene.h"
 #include "StartGameScene.h"
+#include "../GamePlayScene/GamePlayScene.h"
 
 USING_NS_CC;
 
@@ -99,6 +100,11 @@ void SingleLevel::addUI() {
 
 void SingleLevel::menuChapter1Callback(cocos2d::Ref * pSender) {
 	cocos2d::log("the first chapter"); // test
+	this->unscheduleAllSelectors(); // 停止所有调度
+	// 创建场景
+	auto GameScene = GamePlay::createScene();
+	// 切换场景
+	Director::getInstance()->replaceScene(TransitionSlideInR::create(0.25f, GameScene));
 }
 
 void SingleLevel::menuChapter2Callback(cocos2d::Ref * pSender) {

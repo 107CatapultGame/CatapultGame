@@ -57,29 +57,37 @@ void Mainpage::addMenu() {
     const float verticalSpace = 20;
 
     // 开始游戏
-    auto startItem = MenuItemImage::create();
-    startItem->setNormalImage(Sprite::create("images/mainpage/start.png"));
+    auto startItem = MenuItemImage::create(
+        "images/mainpage/start_normal.png",
+        "images/mainpage/start_selected.png",
+        CC_CALLBACK_1(Mainpage::menuStartCallback, this)
+        );
     startItem->setPosition(Vec2(startItem->getContentSize().width / 2 + origin.x + 20,
         visibleSize.height + origin.y - startItem->getContentSize().height / 2 - 100));
-    startItem->setCallback(CC_CALLBACK_1(Mainpage::menuStartCallback, this));
     // 物品栏
-    auto inventoryItem = MenuItemImage::create();
-    inventoryItem->setNormalImage(Sprite::create("images/mainpage/inventory.png"));
+    auto inventoryItem = MenuItemImage::create(
+        "images/mainpage/inventory_normal.png",
+        "images/mainpage/inventory_selected.png",
+        CC_CALLBACK_1(Mainpage::menuInventoryCallback, this)
+        );
     inventoryItem->setPosition(Vec2(startItem->getPosition().x,
         startItem->getPosition().y - inventoryItem->getContentSize().height - verticalSpace));
-    inventoryItem->setCallback(CC_CALLBACK_1(Mainpage::menuInventoryCallback, this));
     // 强化系统
-    auto strengthenItem = MenuItemImage::create();
-    strengthenItem->setNormalImage(Sprite::create("images/mainpage/strengthen.png"));
+    auto strengthenItem = MenuItemImage::create(
+        "images/mainpage/strengthen_normal.png",
+        "images/mainpage/strengthen_selected.png",
+        CC_CALLBACK_1(Mainpage::menuStrengthenCallback, this)
+        );
     strengthenItem->setPosition(Vec2(inventoryItem->getPosition().x,
         inventoryItem->getPosition().y - strengthenItem->getContentSize().height - verticalSpace));
-    strengthenItem->setCallback(CC_CALLBACK_1(Mainpage::menuStrengthenCallback, this));
     // 商店
-    auto storeItem = MenuItemImage::create();
-    storeItem->setNormalImage(Sprite::create("images/mainpage/store.png"));
+    auto storeItem = MenuItemImage::create(
+        "images/mainpage/store_normal.png",
+        "images/mainpage/store_selected.png",
+        CC_CALLBACK_1(Mainpage::menuStoreCallback, this)
+        );
     storeItem->setPosition(Vec2(strengthenItem->getPosition().x,
         strengthenItem->getPosition().y - storeItem->getContentSize().height - verticalSpace));
-    storeItem->setCallback(CC_CALLBACK_1(Mainpage::menuStoreCallback, this));
     // 设置
     auto settingsItem = MenuItemImage::create(
         "images/mainpage/settings_normal.png",

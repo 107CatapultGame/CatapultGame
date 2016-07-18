@@ -28,7 +28,8 @@ bool Mainpage::init() {
         return false;
     }
 
-    visibleSize = Director::getInstance()->getVisibleSize();
+    //visibleSize = Director::getInstance()->getVisibleSize();
+    visibleSize = Global::getVisibleSize();
     origin = Director::getInstance()->getVisibleOrigin();
 
     preloadBGM(); // 预载入BGM

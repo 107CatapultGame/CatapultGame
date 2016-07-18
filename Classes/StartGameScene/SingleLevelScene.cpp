@@ -101,7 +101,6 @@ void SingleLevel::addUI() {
 void SingleLevel::menuChapter1Callback(cocos2d::Ref * pSender) {
 	cocos2d::log("the first chapter"); // test
 	this->unscheduleAllSelectors(); // 停止所有调度
-    Global::game_level = GAME_INFO::first;
 	// 创建场景
 	auto GameScene = GamePlay::createScene();
 	// 切换场景
@@ -120,7 +119,6 @@ void SingleLevel::menuReturnCallback(cocos2d::Ref * pSender) {
 	cocos2d::log("return"); // test
 	//// 本场景出栈并切换到上个场景
 	// Director::getInstance()->popScene();
-    Global::game_level = GAME_INFO::none;
 	this->unscheduleAllSelectors(); // 停止所有调度
 	// 创建场景
 	auto StartGameScene = StartGame::createScene();

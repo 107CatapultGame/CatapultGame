@@ -106,7 +106,6 @@ void StartGame::switchScene() {
 void StartGame::menuSingleCallback(cocos2d::Ref * pSender) {
     cocos2d::log("single"); // test
 	switchScene();
-    Global::game_mode = GAME_INFO::first;
 	// 创建新场景
 	auto SingleLevelScene = SingleLevel::createScene();
 	// 特效切换场景
@@ -123,9 +122,10 @@ void StartGame::menuBattleCallback(cocos2d::Ref * pSender) {
 
 void StartGame::menuReturnCallback(cocos2d::Ref * pSender) {
     cocos2d::log("return"); // test
-    Global::game_mode = GAME_INFO::none;
+                            //// 本场景出栈并切换到上个场景
+                            //Director::getInstance()->popScene();
     this->unscheduleAllSelectors(); // 停止所有调度
-    // 创建场景
+                                    // 创建场景
     auto MainScene = Mainpage::createScene();
     // 切换场景
     Director::getInstance()->replaceScene(TransitionSlideInL::create(0.25f, MainScene));

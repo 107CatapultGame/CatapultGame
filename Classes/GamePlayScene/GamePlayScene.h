@@ -28,7 +28,6 @@ class GamePlay : public cocos2d::Layer {
     // scheduler
     void updateTime(float f); // 更新时间
     void attack(float f); // 更新相互攻击
-    void attackAction(float f);
     // 监听器
     void addContactListener();
     // selector callback functions
@@ -43,14 +42,10 @@ class GamePlay : public cocos2d::Layer {
     cocos2d::Sprite * player; // 玩家
     cocos2d::Sprite * enemy; // 敌人
     // Vector<PhysicsBody*> enemys; // 敌人
-    //cocos2d::Size visibleSize; // 窗体尺寸
+    cocos2d::Size visibleSize; // 窗体尺寸
     cocos2d::Vec2 origin; // 起点坐标
                           // 文字Label
     cocos2d::Label * timeLabel; // 时间
-    cocos2d::Vector<cocos2d::SpriteFrame*> playerAttack;
-    cocos2d::Vector<cocos2d::SpriteFrame*> enemyAttack;
-    //cocos2d::TMXTiledMap * tileMap;
-    //cocos2d::TMXLayer * background;
 };
 
 #endif // __GAME_SCENE_H__

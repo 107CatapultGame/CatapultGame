@@ -10,6 +10,7 @@ public:
 	void initial();
 	void setProgressPercent(float);
 	float getProgressPercent();
+    void setPosAndScale(Sprite * sp);
 
 private:
 	progressTime();

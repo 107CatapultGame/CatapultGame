@@ -22,6 +22,9 @@ cocos2d::Size Global::visibleSize = cocos2d::Size::ZERO;
 
 bitmask Global::bitmask_player = bitmask();
 
+int Global::score = 0;
+bool Global::ifWin = false;
+
 Global::Global() {}
 
 Global::~Global() {}

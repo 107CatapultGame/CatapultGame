@@ -54,3 +54,6 @@ void progressTime::setProgressPercent(float percent) {
 float progressTime::getProgressPercent() {
 	return progressTimer->getPercentage();
 }
+
+void progressTime::setPosAndScale(Sprite * sp) {
+}

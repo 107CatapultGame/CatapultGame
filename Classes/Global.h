@@ -64,6 +64,8 @@ class Global {
     // 游戏模式和关卡
     static GAME_INFO game_mode;
     static GAME_INFO game_level;
+    static int score;
+    static bool ifWin;
 
     private:
     static cocos2d::Size visibleSize;

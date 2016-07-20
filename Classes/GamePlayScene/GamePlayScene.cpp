@@ -2,12 +2,13 @@
 #include "../Controllers/MapController/MapController.h"
 #include "../Controllers/EdgeController/EdgeController.h"
 #include "GamePlayScene.h"
+#include "../MainpageScene.h"
 #include "../StartGameScene/SingleLevelScene.h"
-
 #include "../Controllers/PlayerController/progressTime.h"
-#include "../Controllers/PlayerController/PlayerController.h"
 
 USING_NS_CC;
+
+#define ATTACK_COUNT 11 // 每11发子弹有一发是大型子弹
 
 #define BITMASK_CONTACT 0xFFFFFFFF
 #define BITMASK_EDGE 0x00000001
@@ -51,7 +52,7 @@ bool GamePlay::init(PhysicsWorld* world) {
 
     addBackground(); // 添加背景
     //this->addChild(background/* Global::LAYER_BACKGROUND*/);
-    addMenu(); // 添加菜单
+    //addMenu(); // 添加菜单
     //addUI(); // 添加UI
     addGameItem(); // 添加游戏元素
 
@@ -119,7 +120,7 @@ void GamePlay::addGameItem() {
     //edgeSp->setPhysicsBody(boundBody);
     //this->addChild(edgeSp, Global::LAYER_GAMEPLAY);
 
-    const float catapultSize = 80;
+    catapultSize = 80;
 
     auto spawnPoint = MapController::getInstance()->getObject("born", "spawnpoint");
     int x = spawnPoint["x"].asInt() + spawnPoint["width"].asInt() / 2;
@@ -168,18 +169,18 @@ void GamePlay::addGameItem() {
     enemy->setPhysicsBody(enemyBody);
     this->addChild(enemy);
     //攻击动画
-    playerAttack.reserve(5);
+    playerAttackAnimation.reserve(5);
     for (int i = 0; i < 4; i++) {
         auto frame = SpriteFrame::createWithTexture(texture0, CC_RECT_PIXELS_TO_POINTS(Rect(210 * i, 0, 210, 210)));
-        playerAttack.pushBack(frame);
+        playerAttackAnimation.pushBack(frame);
     }
-    playerAttack.pushBack(frame0);
-    enemyAttack.reserve(5);
+    playerAttackAnimation.pushBack(frame0);
+    enemyAttackAnimation.reserve(5);
     for (int i = 0; i < 4; i++) {
         auto frame = SpriteFrame::createWithTexture(textureE, CC_RECT_PIXELS_TO_POINTS(Rect(210 * i, 0, 210, 210)));
-        enemyAttack.pushBack(frame);
+        enemyAttackAnimation.pushBack(frame);
     }
-    enemyAttack.pushBack(frameE);
+    enemyAttackAnimation.pushBack(frameE);
 
     // 玩家血条
     playerHp = 100.0;
@@ -190,7 +191,7 @@ void GamePlay::addGameItem() {
     //pT->setAnchorPoint(Vec2::ZERO);
     player_hp->setType(ProgressTimerType::BAR);
     player_hp->setBarChangeRate(Point(1, 0));
-    //player_hp->setMidpoint(Point(0, 1));
+    player_hp->setMidpoint(Point(0, 0));
     player_hp->setPercentage(playerHp);
     player_hp->setPosition(player->getContentSize().width / 2, player->getContentSize().height + 7.5);
     player->addChild(player_hp, Global::LAYER_GAMEPLAY + 1);
@@ -206,6 +207,7 @@ void GamePlay::addGameItem() {
     enemy1_hp->setScaleX(enemy->getContentSize().width / enemy1_hp->getContentSize().width);
     enemy1_hp->setType(ProgressTimerType::BAR);
     enemy1_hp->setBarChangeRate(Point(1, 0));
+    enemy1_hp->setMidpoint(Point(0, 0));
     enemy1_hp->setPercentage(enemy1Hp);
     enemy1_hp->setPosition(enemy->getContentSize().width / 2, enemy->getContentSize().height + 7.5);
     enemy->addChild(enemy1_hp, Global::LAYER_GAMEPLAY + 1);
@@ -216,6 +218,8 @@ void GamePlay::addGameItem() {
     // 蓄力条
 	auto pt = progressTime::getInstance();
     addChild(pt, Global::LAYER_GAMEPLAY);
+
+    bulletCount = 0;
 }
 
 void GamePlay::hurt(SPRITE_TYPE spriteType, int bulletType) {
@@ -233,6 +237,10 @@ void GamePlay::hurt(SPRITE_TYPE spriteType, int bulletType) {
             }
             /* 动画 */
             player_hp->runAction(ProgressTo::create(0.2f, playerHp));
+            if (playerHp == 0) {
+                player->removeFromParentAndCleanup(true);
+                gameOver(false);
+            }
             break;
         case SPRITE_TYPE::enemy1:
             if (bulletType == BITMASK_BULLET) {
@@ -245,9 +253,41 @@ void GamePlay::hurt(SPRITE_TYPE spriteType, int bulletType) {
             }
             /* 动画 */
             enemy1_hp->runAction(ProgressTo::create(0.2f, enemy1Hp));
+            if (enemy1Hp == 0) {
+                enemy->removeFromParentAndCleanup(true);
+                gameOver(true);
+            }
             break;
         default:
             break;
+    }
+}
+
+void GamePlay::gameOver(bool ifWin) {
+    this->unscheduleAllSelectors();
+    _eventDispatcher->removeAllEventListeners();
+    Global::ifWin = ifWin;
+    // 返回
+    auto returnItem = MenuItemImage::create(
+        "images/startgame/return_normal.png",
+        "images/startgame/return_selected.png",
+        CC_CALLBACK_1(GamePlay::menuReturnMainCallback, this)
+        );
+    returnItem->setPosition(Vec2(origin.x + Global::getVisibleSize().width / 2,
+        origin.x + Global::getVisibleSize().height / 2 - returnItem->getContentSize().height / 2 - 50));
+
+    // create menu, it's an autorelease object
+    auto menu = Menu::create(returnItem, NULL);
+    menu->setPosition(Vec2::ZERO);
+    this->addChild(menu, Global::LAYER_UI);
+    std::string over = ifWin ? "You Win" : "You Lose";
+    auto label = Label::createWithTTF(over, "fonts/arial.ttf", 40);
+    label->setPosition(Global::getVisibleSize().width / 2, 650);
+    addChild(label, Global::LAYER_UI);
+    if (ifWin) {
+        auto label = Label::createWithTTF("Score:100", "fonts/arial.ttf", 30);
+        label->setPosition(Global::getVisibleSize().width / 2, 600);
+        addChild(label, Global::LAYER_UI);
     }
 }
 
@@ -257,45 +297,99 @@ void GamePlay::updateTime(float f) {
 }
 
 void GamePlay::attack(float f) {
-    /* 动作 */
-    auto plAkAnimation = Animation::createWithSpriteFrames(playerAttack, 0.1f);
-    auto enAkAnimation = Animation::createWithSpriteFrames(enemyAttack, 0.1f);
-
-    auto playerAttackAnimate = Animate::create(plAkAnimation);
+    auto enAkAnimation = Animation::createWithSpriteFrames(enemyAttackAnimation, 0.1f);
     auto enemyAttackAnimate = Animate::create(enAkAnimation);
-
-    player->runAction(playerAttackAnimate);
     enemy->runAction(enemyAttackAnimate);
 
-    const float velocity = 200;
-    
+    // enemy石头坐标和player坐标
+    Vec2 E = enemy->getPosition() + Vec2(-catapultSize / 2, catapultSize / 2), P = player->getPosition();
+    float time1 = 1.5, time2; // 上升下落两段时间
+    float g = this->getScene()->getPhysicsWorld()->getGravity().y * -1; // 重力
+    float Vx, Vy = time1 * g;
+    // 上升高度h1和下落高度h2
+    float h1 = Vy*Vy / (2 * g), h2 = h1 - catapultSize / 2 + E.y - P.y;
+    time2 = sqrt(2 * h2 / g);
+    Vx = -(E.x - P.x + catapultSize / 2) / (time1 + time2);
+
+    // 敌人的投石
+    float radius = 15;
+    auto enemyBullet = Sprite::create("images/gameplay/bullet.png");
+    enemyBullet->setPosition(E);
+    enemyBullet->setScale(radius * 2 / enemyBullet->getContentSize().width);
+    // 子弹的物理body
+    auto ebBody = PhysicsBody::createCircle(enemyBullet->getContentSize().height / 2);
+    ebBody = PhysicsBody::createCircle(radius / enemyBullet->getScale());
+    ebBody->setCategoryBitmask(BITMASK_ENEMY | BITMASK_BULLET); // 设置类别掩码
+    ebBody->setContactTestBitmask(BITMASK_PLAYER | BITMASK_EDGE); // 设置接触测试掩码
+    ebBody->setVelocity(Vec2(Vx, Vy));
+    enemyBullet->setPhysicsBody(ebBody);
+    this->addChild(enemyBullet, Global::LAYER_GAMEPLAY);
+}
+
+void GamePlay::playerAttack(Vec2 touchPos) {
+    // 坐标
+    Vec2 dir = touchPos - player->getPosition();
+    dir = dir.getNormalized();
+    if (!(!flip && dir.x > 0) && !(flip && dir.x < 0)) {
+        return;
+    }
+    // 子弹计数
+    bulletCount = (bulletCount + 1) % ATTACK_COUNT;
+    auto temp = Vec2(abs(dir.x), abs(dir.y));
+    Vec2 bulletInitPos = player->getPosition();
+    auto tempx = (!flip && dir.x > 0) ? 1 : -1;
+    if (temp.x > temp.y) {
+        bulletInitPos += Vec2(tempx * catapultSize / 2, catapultSize / 2 * dir.y / dir.x);
+    } else {
+        bulletInitPos += Vec2(tempx * catapultSize / 2 * dir.x / dir.y, catapultSize / 2);
+    }
+    // 速度公式 baseVelocity + argVelocity * 蓄力程度
+    const float baseVelocity = 300;
+    const float argVelocity = 300;
+    Vec2 velocity = (baseVelocity + argVelocity * totalTimeForProgressBar) * dir;
+
     // 玩家的投石
     auto playerBullet = Sprite::create("images/gameplay/bullet.png");
-    playerBullet->setPosition(player->getPosition()
-        + Vec2(player->getContentSize().width * player->getScaleX() / 2
-        + playerBullet->getContentSize().width / 2, 0));
-    // 子弹的物理body
-    auto pbBody = PhysicsBody::createCircle(playerBullet->getContentSize().height / 2);
-    pbBody->setCategoryBitmask(BITMASK_PLAYER | BITMASK_BULLET); // 设置类别掩码
-    //pbBody->setCollisionBitmask(0);
-    pbBody->setContactTestBitmask(BITMASK_ENEMY | BITMASK_EDGE); // 设置接触测试掩码
-    pbBody->setVelocity(Vec2(velocity, 0));
+    PhysicsBody * pbBody;
+    float radius;
+    if (bulletCount) { // 小子弹
+        radius = 15;
+        playerBullet->setScale(radius * 2 / playerBullet->getContentSize().width);
+        pbBody = PhysicsBody::createCircle(radius / playerBullet->getScale());
+        pbBody->setCategoryBitmask(BITMASK_PLAYER | BITMASK_BULLET); // 设置类别掩码 
+        pbBody->setContactTestBitmask(BITMASK_ENEMY | BITMASK_EDGE); // 设置接触测试掩码
+        pbBody->setMass(1.0f);
+    } else { // 大子弹
+        radius = 30;
+        playerBullet->setScale(radius * 2 / playerBullet->getContentSize().width);
+        pbBody = PhysicsBody::createCircle(radius / playerBullet->getScale());
+        pbBody->setCategoryBitmask(BITMASK_PLAYER | BITMASK_BULLET2); // 设置类别掩码 
+        pbBody->setContactTestBitmask(BITMASK_ENEMY | BITMASK_EDGE); // 设置接触测试掩码
+        pbBody->setMass(8.0f);
+    }
+    Vec2 add = (temp.x > temp.y) ? Vec2(radius, 0) : Vec2(0, radius);
+    playerBullet->setPosition(bulletInitPos + add);
+    cocos2d::log("(%f, %f)", player->getPositionX(), player->getPositionY());
+    cocos2d::log("(%f, %f), (%f, %f)", bulletInitPos.x, bulletInitPos.y, playerBullet->getPositionX(), playerBullet->getPositionY());
+    pbBody->setVelocity(velocity + player->getPhysicsBody()->getVelocity());
     playerBullet->setPhysicsBody(pbBody);
     this->addChild(playerBullet, Global::LAYER_GAMEPLAY);
 
+    /* 动作 */
+    auto plAkAnimation = Animation::createWithSpriteFrames(playerAttackAnimation, 0.1f);
+    auto playerAttackAnimate = Animate::create(plAkAnimation);
+    player->runAction(playerAttackAnimate);
+}
 
-    // 敌人的投石
-    auto enemyBullet = Sprite::create("images/gameplay/bullet.png");
-    enemyBullet->setPosition(enemy->getPosition()
-        - Vec2(enemy->getContentSize().width * enemy->getScaleX() / 2
-        + enemyBullet->getContentSize().width / 2, 0));
-    // 子弹的物理body
-    auto ebBody = PhysicsBody::createCircle(enemyBullet->getContentSize().height / 2);
-    ebBody->setCategoryBitmask(BITMASK_ENEMY | BITMASK_BULLET); // 设置类别掩码
-    ebBody->setContactTestBitmask(BITMASK_PLAYER | BITMASK_EDGE); // 设置接触测试掩码
-    ebBody->setVelocity(Vec2(-velocity, 0));
-    enemyBullet->setPhysicsBody(ebBody);
-    this->addChild(enemyBullet, Global::LAYER_GAMEPLAY);
+void GamePlay::updateTimeForProgressBar(float f) {
+    totalTimeForProgressBar += f;
+    if (totalTimeForProgressBar >= 1.0) {
+        progressTime::getInstance()->setProgressPercent(0);
+        totalTimeForProgressBar = 0;
+        return;
+    } else {
+        progressTime::getInstance()->setProgressPercent(totalTimeForProgressBar * 100);
+    }
 }
 
 void GamePlay::move(float f) {
@@ -358,8 +452,17 @@ void GamePlay::menuReturnCallback(cocos2d::Ref * pSender) {
     Director::getInstance()->replaceScene(TransitionSlideInL::create(0.25f, SingleLevelScene));
 }
 
+void GamePlay::menuReturnMainCallback(cocos2d::Ref * pSender) {
+    Director::getInstance()->getEventDispatcher()->removeAllEventListeners();
+    this->unscheduleAllSelectors(); // 停止所有调度
+                                    // 创建场景
+    auto MainPageScene = Mainpage::createScene();
+    // 切换场景
+    Director::getInstance()->replaceScene(TransitionSlideInL::create(0.25f, MainPageScene));
+}
+
 bool GamePlay::onConcactBegan(cocos2d::PhysicsContact & contact) {
-    cocos2d::log("began"); // test
+    //cocos2d::log("began"); // test
     auto body1 = contact.getShapeA()->getBody();
     auto body2 = contact.getShapeB()->getBody();
     auto sprite1 = (Sprite *)contact.getShapeA()->getBody()->getNode();
@@ -371,12 +474,16 @@ bool GamePlay::onConcactBegan(cocos2d::PhysicsContact & contact) {
         if (body1->getCategoryBitmask() & (BITMASK_BULLET | BITMASK_BULLET2) &&
             body2->getCategoryBitmask() & BITMASK_EDGE) {
             body1->removeFromWorld();
-            sprite1->removeFromParentAndCleanup(true);
+            if (sprite1) {
+                sprite1->removeFromParentAndCleanup(true);
+            }
             return false;
         }else if (body2->getCategoryBitmask() & (BITMASK_BULLET | BITMASK_BULLET2) &&
             body1->getCategoryBitmask() & BITMASK_EDGE) {
             body2->removeFromWorld();
-            sprite2->removeFromParentAndCleanup(true);
+            if (sprite2) {
+                sprite2->removeFromParentAndCleanup(true);
+            }
             return false;
         }
         // 条件成立， 执行相交通知
@@ -411,11 +518,15 @@ bool GamePlay::onConcactPreSolve(cocos2d::PhysicsContact & contact) {
         } else if (body1->getCategoryBitmask() & BITMASK_BODY && body2->getCategoryBitmask() & (BITMASK_BULLET | BITMASK_BULLET2)) {
             // 其中一个不是子弹则只移除子弹
             body1->setVelocity(Vec2::ZERO);
+            SPRITE_TYPE temp = (body1->getCategoryBitmask() & BITMASK_PLAYER) ? SPRITE_TYPE::player : SPRITE_TYPE::enemy1;
+            hurt(temp, (body2->getCategoryBitmask() & BITMASK_BULLET) ? BITMASK_BULLET : BITMASK_BULLET2);
             body2->removeFromWorld();
             sprite2->removeFromParentAndCleanup(true);
             return false;
         } else if (body2->getCategoryBitmask() & BITMASK_BODY && body1->getCategoryBitmask() & (BITMASK_BULLET | BITMASK_BULLET2)) {
             body2->setVelocity(Vec2::ZERO);
+            SPRITE_TYPE temp = (body2->getCategoryBitmask() & BITMASK_PLAYER) ? SPRITE_TYPE::player : SPRITE_TYPE::enemy1;
+            hurt(temp, (body1->getCategoryBitmask() & BITMASK_BULLET) ? BITMASK_BULLET : BITMASK_BULLET2);
             body1->removeFromWorld();
             sprite1->removeFromParentAndCleanup(true);
             return false;
@@ -517,18 +628,15 @@ bool GamePlay::onTouchBegan(Touch *touch, Event *unused_event) {
 
 	totalTimeForProgressBar = 0;
 	progressTime::getInstance()->setProgressPercent(0);
-	player->schedule(schedule_selector(PlayerController::updateTimeForProgressBar), 0.1f);
+	this->schedule(schedule_selector(GamePlay::updateTimeForProgressBar), 0.1f);
 	return true;
 }
 
 void GamePlay::onTouchEnded(Touch *touch, Event *unused_event) {
-	//PlayerController::touchEnded(touch->getLocation());
-	Size visibleSize = Global::getVisibleSize();
-	// Vec2 cameraLocation = CameraController::getInstance()->getCamera()->getPosition();
-
-	// Vec2 touchEndedPosition = Vec2(touchPoint.x + (cameraLocation.x - visibleSize.width / 2), touchPoint.y + (cameraLocation.y - visibleSize.height / 2));
-	//archer_->aimAt(touchEndedPosition);
-
-	player->unschedule(schedule_selector(PlayerController::updateTimeForProgressBar));
+    auto touchPos = touch->getLocation();
+    playerAttack(touchPos);
+    progressTime::getInstance()->setProgressPercent(0);
+    totalTimeForProgressBar = 0;
+	this->unschedule(schedule_selector(GamePlay::updateTimeForProgressBar));
 	// Vec2 beginPosition = archer_->getPosition();
 }

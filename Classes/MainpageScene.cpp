@@ -158,7 +158,7 @@ void Mainpage::playBGM() {
 
 void Mainpage::switchScene() {
     unscheduleAllSelectors(); // 停止调度器
-    CocosDenshion::SimpleAudioEngine::getInstance()->stopBackgroundMusic();
+    //CocosDenshion::SimpleAudioEngine::getInstance()->stopBackgroundMusic();
 }
 
 void Mainpage::updateTime(float f) {

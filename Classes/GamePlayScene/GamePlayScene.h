@@ -32,15 +32,18 @@ class GamePlay : public cocos2d::Layer {
     void addGameItem();
     /** 造成伤害 */
     void hurt(SPRITE_TYPE spriteType, int bulletType);
+    void gameOver(bool ifWin);
     // scheduler
     void updateTime(float f); // 更新时间
     void attack(float f); // 更新相互攻击
-    void attackAction(float f);
+    void playerAttack(cocos2d::Vec2 touchPos);
+    void updateTimeForProgressBar(float f);
     void move(float f);
     // 监听器
     void addListener();
     // selector callback functions
     void menuReturnCallback(cocos2d::Ref* pSender);
+    void menuReturnMainCallback(cocos2d::Ref* pSender);
     bool onConcactBegan(cocos2d::PhysicsContact& contact);
     bool onConcactPreSolve(cocos2d::PhysicsContact& contact);
     bool onConcactPostSolve(cocos2d::PhysicsContact& contact);
@@ -52,13 +55,14 @@ class GamePlay : public cocos2d::Layer {
 
     cocos2d::Sprite * player; // 玩家
     cocos2d::Sprite * enemy; // 敌人
+    float catapultSize;
     // Vector<PhysicsBody*> enemys; // 敌人
     //cocos2d::Size visibleSize; // 窗体尺寸
     cocos2d::Vec2 origin; // 起点坐标
                           // 文字Label
     cocos2d::Label * timeLabel; // 时间
-    cocos2d::Vector<cocos2d::SpriteFrame*> playerAttack;
-    cocos2d::Vector<cocos2d::SpriteFrame*> enemyAttack;
+    cocos2d::Vector<cocos2d::SpriteFrame*> playerAttackAnimation;
+    cocos2d::Vector<cocos2d::SpriteFrame*> enemyAttackAnimation;
     int moveDirection; // 0=no, 1=left, 2=right
     bool flip;
     //cocos2d::TMXTiledMap * tileMap;
@@ -69,7 +73,7 @@ class GamePlay : public cocos2d::Layer {
     float enemy1Hp;
     int bulletCount; // 子弹计数-满10个自动更换大型子弹
 	cocos2d::ProgressTimer * attackProgress;
-    int totalTimeForProgressBar;
+    float totalTimeForProgressBar;
 };
 
 #endif // __GAME_SCENE_H__

@@ -54,12 +54,6 @@ Node * GameEdge::createSoilEdge(cocos2d::Point start, cocos2d::Point end) {
     auto size = Size(abs(end.x - start.x), abs(end.y - start.y));
     aNode->setPhysicsBody(PhysicsBody::createBox(size));
     aNode->getPhysicsBody()->setDynamic(false);
-    //bitmask aBitmask = Constant::getEdge1Bitmask();
-    //auto physicsBody = aNode->getPhysicsBody();
-    //physicsBody->setCategoryBitmask(aBitmask.categoryBitmask);
-    //physicsBody->setCollisionBitmask(aBitmask.collisionBitmask);
-    //physicsBody->setContactTestBitmask(aBitmask.contactTestBitmask);
-    //physicsBody->setGroup(aBitmask.group);
     return aNode;
 }
 
@@ -70,12 +64,6 @@ Node * GameEdge::createSteelEdge(cocos2d::Point start, cocos2d::Point end) {
     auto size = Size(abs(end.x - start.x), abs(end.y - start.y));
     aNode->setPhysicsBody(PhysicsBody::createBox(size));
     aNode->getPhysicsBody()->setDynamic(false);
-    //bitmask aBitmask = Constant::getEdge1Bitmask();
-    //auto physicsBody = aNode->getPhysicsBody();
-    //physicsBody->setCategoryBitmask(aBitmask.categoryBitmask);
-    //physicsBody->setCollisionBitmask(aBitmask.collisionBitmask);
-    //physicsBody->setContactTestBitmask(aBitmask.contactTestBitmask);
-    //physicsBody->setGroup(aBitmask.group);
     return aNode;
 }
 
@@ -86,12 +74,5 @@ Node * GameEdge::createStockEdge(cocos2d::Point start, cocos2d::Point end) {
     auto size = Size(abs(end.x - start.x), abs(end.y - start.y));
     aNode->setPhysicsBody(PhysicsBody::createBox(size));
     aNode->getPhysicsBody()->setDynamic(false);
-
-    //bitmask aBitmask = Constant::getEdge1Bitmask();
-    //auto physicsBody = aNode->getPhysicsBody();
-    //physicsBody->setCategoryBitmask(aBitmask.categoryBitmask);
-    //physicsBody->setCollisionBitmask(aBitmask.collisionBitmask);
-    //physicsBody->setContactTestBitmask(aBitmask.contactTestBitmask);
-    //physicsBody->setGroup(aBitmask.group);
     return aNode;
 }

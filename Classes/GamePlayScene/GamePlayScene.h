@@ -15,6 +15,11 @@ class GamePlay : public cocos2d::Layer {
 
     // implement the "static create()" method manually
     static GamePlay* create(cocos2d::PhysicsWorld* world);
+
+	bool onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *unused_event);
+	void onTouchEnded(cocos2d::Touch *touch, cocos2d::Event *unused_event);
+	//void update(float dt);
+
     private:
     // 辅助函数
     /** 为场景添加背景 */
@@ -63,6 +68,8 @@ class GamePlay : public cocos2d::Layer {
     float playerHp;
     float enemy1Hp;
     int bulletCount; // 子弹计数-满10个自动更换大型子弹
+	cocos2d::ProgressTimer * attackProgress;
+    int totalTimeForProgressBar;
 };
 
 #endif // __GAME_SCENE_H__

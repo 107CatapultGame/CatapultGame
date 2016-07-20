@@ -2,6 +2,7 @@
 #define __GAME_SCENE_H__
 
 #include "cocos2d.h"
+#include "../Game/Classes/Controllers/PlayerController/PlayerController.h"
 
 class GamePlay : public cocos2d::Layer {
     public:
@@ -15,6 +16,11 @@ class GamePlay : public cocos2d::Layer {
 
     // implement the "static create()" method manually
     static GamePlay* create(cocos2d::PhysicsWorld* world);
+
+	bool onTouchBegan(Touch *touch, Event *unused_event);
+	void onTouchEnded(Touch *touch, Event *unused_event);
+	//void update(float dt);
+
     private:
     // 辅助函数
     /** 为场景添加背景 */
@@ -49,6 +55,8 @@ class GamePlay : public cocos2d::Layer {
     cocos2d::Label * timeLabel; // 时间
     cocos2d::Vector<cocos2d::SpriteFrame*> playerAttack;
     cocos2d::Vector<cocos2d::SpriteFrame*> enemyAttack;
+	cocos2d::ProgressTimer * attackProgress;
+	int totalTimeForProgressBar;
     //cocos2d::TMXTiledMap * tileMap;
     //cocos2d::TMXLayer * background;
 };

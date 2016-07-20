@@ -4,6 +4,8 @@
 #include "GamePlayScene.h"
 #include "../StartGameScene/SingleLevelScene.h"
 
+#include "../Game/Classes/Controllers/PlayerController/progressTime.h"
+
 USING_NS_CC;
 
 #define BITMASK_CONTACT 0xFFFFFFFF
@@ -46,14 +48,14 @@ bool GamePlay::init(PhysicsWorld* world) {
 
     addBackground(); // 添加背景
     //this->addChild(background/* Global::LAYER_BACKGROUND*/);
-    addMenu(); // 添加菜单
-    addUI(); // 添加UI
+    // addMenu(); // 添加菜单
+    // addUI(); // 添加UI
     addGameItem(); // 添加游戏元素
 
     addContactListener(); // 添加监听器
 
     // 每分钟更新一次时间
-    this->schedule(schedule_selector(GamePlay::updateTime), 60.0f, kRepeatForever, 0);
+    //this->schedule(schedule_selector(GamePlay::updateTime), 60.0f, kRepeatForever, 0);
     // 每秒相互攻击
     //this->scheduleOnce(schedule_selector(GamePlay::attack), 2.0f);
     this->schedule(schedule_selector(GamePlay::attack), 1.0f, kRepeatForever, 2.0f);
@@ -124,6 +126,17 @@ void GamePlay::addGameItem() {
     auto frame0 = SpriteFrame::createWithTexture(texture0, CC_RECT_PIXELS_TO_POINTS(Rect(0, 0, 210, 210)));
 
     // 添加玩家
+
+	auto pt = progressTime::getInstance();
+	addChild(pt, Global::LAYER_GAMEPLAY);
+
+	EventListenerTouchOneByOne* screenListener = EventListenerTouchOneByOne::create();
+	screenListener->setSwallowTouches(true);// true不向下触摸，简单点来说，比如有两个sprite ,A和 B，A在上B在下（位置重叠）
+	screenListener->onTouchBegan = CC_CALLBACK_2(GamePlay::onTouchBegan, this);
+	screenListener->onTouchEnded = CC_CALLBACK_2(GamePlay::onTouchEnded, this);
+	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(screenListener, this);
+
+
     player = Sprite::createWithSpriteFrame(frame0);
     cocos2d::log("%d, %d", x, y);
     player->setScale(catapultSize / player->getContentSize().height);
@@ -320,4 +333,29 @@ bool GamePlay::onConcactPostSolve(cocos2d::PhysicsContact & contact) {
     //    }
     //}
     return true;
+}
+
+bool GamePlay::onTouchBegan(Touch *touch, Event *unused_event) {
+	//PlayerController::touchBegan(touch->getLocation());
+	Size visibleSize = Global::getVisibleSize();
+
+	//Vec2 touchEndedPosition = Vec2(touchPoint.x + (cameraLocation.x - visibleSize.width / 2), touchPoint.y + (cameraLocation.y - visibleSize.height / 2));
+	//archer_->aimAt(touchEndedPosition);
+
+	totalTimeForProgressBar = 0;
+	progressTime::getInstance()->setProgressPercent(0);
+	player->schedule(schedule_selector(PlayerController::updateTimeForProgressBar), 0.1f);
+	return true;
+}
+
+void GamePlay::onTouchEnded(Touch *touch, Event *unused_event) {
+	//PlayerController::touchEnded(touch->getLocation());
+	Size visibleSize = Global::getVisibleSize();
+	// Vec2 cameraLocation = CameraController::getInstance()->getCamera()->getPosition();
+
+	// Vec2 touchEndedPosition = Vec2(touchPoint.x + (cameraLocation.x - visibleSize.width / 2), touchPoint.y + (cameraLocation.y - visibleSize.height / 2));
+	//archer_->aimAt(touchEndedPosition);
+
+	player->unschedule(schedule_selector(PlayerController::updateTimeForProgressBar));
+	// Vec2 beginPosition = archer_->getPosition();
 }

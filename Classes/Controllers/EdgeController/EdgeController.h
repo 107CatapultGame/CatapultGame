@@ -13,6 +13,9 @@ class EdgeController : public cocos2d::Sprite {
 
 
     void createGameEdgeSegment();
+    void createSoilEdge();
+    void createSteelEdge();
+    void createStockEdge();
 
     //属性参数
 

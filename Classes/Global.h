@@ -13,7 +13,7 @@ struct bitmask {
     int_32 contactTestBitmask; // 接触
     int_32 collisionBitmask;   // 碰撞
     int_32 group;              // 组别
-    bitmask(int_32 cate = 0, int_32 con = 0, int_32 col = 0, int_32 gp = 0) {
+    bitmask(int_32 cate = 0xffffffff, int_32 con = 0, int_32 col = 0xffffffff, int_32 gp = 0) {
         categoryBitmask = cate;
         contactTestBitmask = con;
         collisionBitmask = col;
@@ -26,6 +26,14 @@ static enum GAME_INFO {
     none, first, second, third
 };
 
+static enum MAP_ELEM_TYPE {
+    foothold, soil, steel, stock, playerFlag, enemyFlag
+};
+
+static enum SPRITE_TYPE {
+    player, enemy1
+};
+
 /** Global全局类, 放置一些全局层面的变量与函数 */
 class Global {
     public:
@@ -35,16 +43,19 @@ class Global {
     static std::string getSystemTime();
     /** 获取窗口大小 */
     static cocos2d::Size getVisibleSize();
-    /** 获取玩家掩码 */
-    static bitmask getPlayerBitmask();
-    static bitmask getPlayerBulletBitmask();
-    /** 获取敌人掩码 */
-    static bitmask getEnemy1Bitmask();
-    static bitmask getEnemy1BulletBitmask();
-    static int getPlayerTag();
-    static int getPlayerBulletTag();
-    static int getEnemy1Tag();
-    static int getEnemyBulletTag();
+    /** 获取地图元素掩码 */
+    static bitmask getMapElemBitmask(MAP_ELEM_TYPE type);
+    /** 获取玩家/敌人掩码 */
+    static bitmask getSpriteBitmask(SPRITE_TYPE type);
+    /** 获取石头掩码 */
+    static bitmask getBullet1Bitmask(SPRITE_TYPE type);
+    static bitmask getBullet2Bitmask(SPRITE_TYPE type);
+    /** 获取地图元素标签 */
+    static bitmask getMapElemTag(MAP_ELEM_TYPE type);
+    /** 获取玩家/敌人标签 */
+    static int getSpriteTag(SPRITE_TYPE type);
+    static int getBullet1Tag(SPRITE_TYPE type);
+    static int getBullet2Tag(SPRITE_TYPE type);
 
     // 用以指定Sprite的层级
     const static uint_8 LAYER_BACKGROUND; // 背景层
@@ -61,7 +72,5 @@ class Global {
     static bitmask bitmask_player;
     static bitmask bitmask_enemy1;
 };
-
-
 
 #endif // __GLOBAL_SCENE_H__

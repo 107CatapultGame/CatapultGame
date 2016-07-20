@@ -3,7 +3,7 @@
 
 #include "cocos2d.h"
 
-class GameEdge : public cocos2d::Sprite {
+class GameEdge : public cocos2d::Node {
     public:
     GameEdge();
     ~GameEdge();
@@ -11,16 +11,18 @@ class GameEdge : public cocos2d::Sprite {
     static GameEdge * getInstance();
     virtual bool init();
 
-
-    void createGameEdgeSegment(cocos2d::Point start, cocos2d::Point end);
+    static Node * createGameEdgeSegment(cocos2d::Point start, cocos2d::Point end);
+    static Node * createSoilEdge(cocos2d::Point start, cocos2d::Point end);
+    static Node * createSteelEdge(cocos2d::Point start, cocos2d::Point end);
+    static Node * createStockEdge(cocos2d::Point start, cocos2d::Point end);
 
     //属性参数
 
     private:
     static GameEdge * _edge;
 
-    cocos2d::Sprite * body;
-
+    static cocos2d::Point edgeStartPoint;
+    static cocos2d::Point edgeEndPoint;
 };
 
 #endif // __EDGE_SCENE_H__

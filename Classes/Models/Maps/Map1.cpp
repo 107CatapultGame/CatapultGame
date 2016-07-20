@@ -30,13 +30,18 @@ bool Map1::init() {
     meta = map->getLayer("meta");
     meta->setVisible(false);
 
-    auto edgeGroup = map->getObjectGroup("foothold");
-    auto edges = edgeGroup->getObjects();
-    for (auto edge : edges) {
-        auto temp = edge.asValueMap();
-        int x = temp["x"].asInt() + temp["width"].asInt() / 2;
-        int y = temp["y"].asInt() + temp["height"].asInt() / 2;
-    }
+    //auto edges = map->getObjectGroup("foothold")->getObjects();
+    //if (!edges.empty()) {
+    //    // 创建边界
+    //    for (auto edge : edges) {
+    //        auto temp = edge.asValueMap();
+    //        int xStart = temp["x"].asInt();
+    //        int xEnd = temp["x"].asInt() + temp["width"].asInt();
+    //        int y = temp["y"].asInt() + temp["height"].asInt();
+    //        this->addChild(GameEdge::createGameEdgeSegment(Point(xStart, y), Point(xEnd, y)));
+    //    }
+    //}
+
     return true;
 }
 

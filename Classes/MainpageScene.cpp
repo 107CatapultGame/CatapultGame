@@ -1,8 +1,11 @@
 #include "Global.h"
 #include "MainpageScene.h"
 #include "StartGameScene/StartGameScene.h"
-
+#include "InventoryScene\InventoryScene.h"
 #include "SimpleAudioEngine.h"
+#include "StrengthenScene\StrengthenScene.h"
+#include "StoreScene\StoreScene.h"
+#include "SettingsScene\SettingsScene.h"
 
 USING_NS_CC;
 
@@ -177,16 +180,37 @@ void Mainpage::menuStartCallback(cocos2d::Ref* pSender) {
 
 void Mainpage::menuInventoryCallback(cocos2d::Ref* pSender) {
     cocos2d::log("inventory"); // test
+	switchScene();
+	// 创建新场景
+	auto InventoryScene = Inventory::createScene();
+	// 特效切换场景
+	Director::getInstance()->replaceScene(TransitionSlideInR::create(0.25f, InventoryScene));
 }
 
 void Mainpage::menuStrengthenCallback(cocos2d::Ref* pSender) {
     cocos2d::log("strengthen"); // test
+	switchScene();
+	// 创建新场景
+	auto StrengthenScene = Strengthen::createScene();
+	// 特效切换场景
+	Director::getInstance()->replaceScene(TransitionSlideInR::create(0.25f, StrengthenScene));
 }
 
 void Mainpage::menuStoreCallback(cocos2d::Ref* pSender) {
     cocos2d::log("store"); // test
+	switchScene();
+	// 创建新场景
+	auto StoreScene = Store::createScene();
+	// 特效切换场景
+	Director::getInstance()->replaceScene(TransitionSlideInR::create(0.25f, StoreScene));
 }
 
 void Mainpage::menuSettingsCallback(cocos2d::Ref* pSender) {
     cocos2d::log("setting"); // test
+	switchScene();
+	// 创建新场景
+	auto SettingsScene = Settings::createScene();
+	// 特效切换场景
+	Director::getInstance()->replaceScene(TransitionSlideInR::create(0.25f, SettingsScene));
 }
+

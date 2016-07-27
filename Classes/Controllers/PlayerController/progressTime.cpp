@@ -26,12 +26,12 @@ void progressTime::initial() {
 	// Size visibleSize = ParameterManager::getVisibleSize();
 
 	progressSprite2 = Sprite::create("images/gameplay/processBar2.png");
-	progressSprite2->setPosition(Global::getVisibleSize().width / 2, Global::getVisibleSize().height - 50);
+	progressSprite2->setPosition(Global::getVisibleSize().width / 2, Global::getVisibleSize().height - 30);
 	progressTimeInstance->addChild(progressSprite2, 2);
 
 	progressSprite1 = Sprite::create("images/gameplay/processBar.png");
 	progressTimer = ProgressTimer::create(progressSprite1);
-	progressTimer->setPosition(Global::getVisibleSize().width / 2, Global::getVisibleSize().height - 50);
+	progressTimer->setPosition(Global::getVisibleSize().width / 2, Global::getVisibleSize().height - 30);
 	progressTimer->setType(ProgressTimer::Type::BAR);
 	progressTimer->setMidpoint(Point(0, 0));
 	progressTimer->setBarChangeRate(Point(1, 0));
@@ -39,7 +39,7 @@ void progressTime::initial() {
 
 	progressTimerLabel = Label::create("0%", "fonts/arial.ttf", 10);
 	progressTimerLabel->setAnchorPoint(Vec2(0, 0.5));
-	progressTimerLabel->setPosition(Global::getVisibleSize().width / 2 + progressTimer->getContentSize().width / 2, Global::getVisibleSize().height - 50);
+	progressTimerLabel->setPosition(Global::getVisibleSize().width / 2 + progressTimer->getContentSize().width / 2, Global::getVisibleSize().height - 30);
 	progressTimeInstance->addChild(progressTimerLabel, 1);
 
 	progressTimeInstance->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);

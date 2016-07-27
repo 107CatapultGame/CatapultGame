@@ -70,3 +70,16 @@ cocos2d::Point Map1::getTileCoordForPosition(cocos2d::Point pos) {
     int y = ((map->getMapSize().height * map->getTileSize().height) - pos.y) / map->getTileSize().height;
     return Point(x, y);
 }
+
+cocos2d::Size Map1::getTileSize() {
+    return map->getTileSize();
+}
+
+cocos2d::Size Map1::getMapSize() {
+    return map->getMapSize();
+}
+
+void Map1::removeTileAt(cocos2d::Point pos) {
+    map->getLayer("barrier")->removeTileAt(pos);
+    map->getLayer("background")->setTileGID(map->getLayer("background")->getTileGIDAt(Vec2(0, 0)), pos);
+}

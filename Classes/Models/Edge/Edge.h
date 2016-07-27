@@ -12,9 +12,7 @@ class GameEdge : public cocos2d::Node {
     virtual bool init();
 
     static Node * createGameEdgeSegment(cocos2d::Point start, cocos2d::Point end);
-    static Node * createSoilEdge(cocos2d::Point start, cocos2d::Point end);
-    static Node * createSteelEdge(cocos2d::Point start, cocos2d::Point end);
-    static Node * createStockEdge(cocos2d::Point start, cocos2d::Point end);
+    static Node * createShape(cocos2d::Point start, cocos2d::Point end);
 
     //属性参数
 

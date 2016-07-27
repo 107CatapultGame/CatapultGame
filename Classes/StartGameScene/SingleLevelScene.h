@@ -31,7 +31,7 @@ private:
 	cocos2d::Size visibleSize; // 窗体尺寸
 	cocos2d::Vec2 origin; // 起点坐标
 	// 文字Label
-	cocos2d::Label * timeLabel; // 时间
+	cocos2d::Label * scoreLabel; // 时间
 };
 
 #endif // __SINGLELEVEL_SCENE_H__

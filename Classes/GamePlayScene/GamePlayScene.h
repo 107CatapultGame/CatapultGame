@@ -31,14 +31,16 @@ class GamePlay : public cocos2d::Layer {
     /** 为场景添加游戏元素 */
     void addGameItem();
     /** 造成伤害 */
-    void hurt(SPRITE_TYPE spriteType, int bulletType);
+    bool hurt(SPRITE_TYPE spriteType, BULLET_TYPE bulletType);
     void gameOver(bool ifWin);
     // scheduler
     void updateTime(float f); // 更新时间
+    void updateScore(); // 更新分数
     void attack(float f); // 更新相互攻击
     void playerAttack(cocos2d::Vec2 touchPos);
     void updateTimeForProgressBar(float f);
     void move(float f);
+    void playAudioEffect();
     // 监听器
     void addListener();
     // selector callback functions
@@ -60,18 +62,19 @@ class GamePlay : public cocos2d::Layer {
     //cocos2d::Size visibleSize; // 窗体尺寸
     cocos2d::Vec2 origin; // 起点坐标
                           // 文字Label
-    cocos2d::Label * timeLabel; // 时间
+    cocos2d::Label * scoreLabel; // 分数
     cocos2d::Vector<cocos2d::SpriteFrame*> playerAttackAnimation;
     cocos2d::Vector<cocos2d::SpriteFrame*> enemyAttackAnimation;
     int moveDirection; // 0=no, 1=left, 2=right
     bool flip;
-    //cocos2d::TMXTiledMap * tileMap;
-    //cocos2d::TMXLayer * background;
     cocos2d::ProgressTimer * player_hp;
     cocos2d::ProgressTimer * enemy1_hp;
     float playerHp;
     float enemy1Hp;
+    const float playerInitHP = 500;
+    const float enemy1InitHP = 800;
     int bulletCount; // 子弹计数-满10个自动更换大型子弹
+    bool canJump;
 	cocos2d::ProgressTimer * attackProgress;
     float totalTimeForProgressBar;
 };

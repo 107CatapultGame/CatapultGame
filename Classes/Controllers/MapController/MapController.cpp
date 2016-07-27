@@ -62,3 +62,43 @@ cocos2d::ValueVector MapController::getObjects(std::string objGroup) {
         }
     }
 }
+
+cocos2d::Point MapController::getTileCoordForPosition(cocos2d::Point pos) {
+    switch (Global::game_level) {
+        case GAME_INFO::first:
+            return map1->getTileCoordForPosition(pos);
+            break;
+        default:
+            break;
+    }
+}
+
+Size MapController::getTileSize() {
+    switch (Global::game_level) {
+        case GAME_INFO::first:
+            return map1->getTileSize();
+            break;
+        default:
+            break;
+    }
+}
+
+cocos2d::Size MapController::getMapSize() {
+    switch (Global::game_level) {
+        case GAME_INFO::first:
+            return map1->getMapSize();
+            break;
+        default:
+            break;
+    }
+}
+
+void MapController::removeTileAt(cocos2d::Point pos) {
+    switch (Global::game_level) {
+        case GAME_INFO::first:
+            map1->removeTileAt(getTileCoordForPosition(pos));
+            break;
+        default:
+            break;
+    }
+}

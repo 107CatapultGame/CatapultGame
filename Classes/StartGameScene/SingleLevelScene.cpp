@@ -92,10 +92,10 @@ void SingleLevel::addUI() {
 	auto timeBg = Sprite::create("images/startgame/SingleLevel/time.png");
 	timeBg->setPosition(Vec2(origin.x + visibleSize.width - timeBg->getContentSize().width / 2 - 20,
 		origin.y + timeBg->getContentSize().height / 2 + 20));
-	timeLabel = Label::create(Global::getSystemTime(), "fonts/arial.ttf", 20);
-	timeLabel->setPosition(timeBg->getPosition());
+	scoreLabel = Label::create(Global::getSystemTime(), "fonts/arial.ttf", 20);
+	scoreLabel->setPosition(timeBg->getPosition());
 	this->addChild(timeBg, Global::LAYER_UI);
-	this->addChild(timeLabel, Global::LAYER_UI + 1); // 文字层比背景图层高一级
+	this->addChild(scoreLabel, Global::LAYER_UI + 1); // 文字层比背景图层高一级
 }
 
 void SingleLevel::menuChapter1Callback(cocos2d::Ref * pSender) {
@@ -130,5 +130,5 @@ void SingleLevel::menuReturnCallback(cocos2d::Ref * pSender) {
 
 void SingleLevel::updateTime(float f) {
 	// 更新时间
-	timeLabel->setString(Global::getSystemTime());
+	scoreLabel->setString(Global::getSystemTime());
 }

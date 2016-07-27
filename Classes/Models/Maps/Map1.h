@@ -18,6 +18,9 @@ class Map1 : public cocos2d::TMXTiledMap {
     cocos2d::ValueVector getObjects(std::string objGroup);
     /** 从给定的位置计算TileMap坐标 */
     cocos2d::Point getTileCoordForPosition(cocos2d::Point pos);
+    cocos2d::Size getTileSize();
+    cocos2d::Size getMapSize();
+    void removeTileAt(cocos2d::Point pos);
 
     private:
     static Map1 * _map1;

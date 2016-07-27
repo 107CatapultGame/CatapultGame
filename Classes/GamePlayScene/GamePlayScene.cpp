@@ -218,9 +218,9 @@ bool GamePlay::hurt(SPRITE_TYPE spriteType, BULLET_TYPE bulletType) {
     const float bullet2 = Global::getBulletHurt(BULLET_TYPE::bullet2);
     switch (spriteType) {
         case SPRITE_TYPE::player:
-            if (bulletType == Global::BITMASK_BULLET1) {
+            if (bulletType == BULLET_TYPE::bullet1) {
                 playerHp -= bullet1;
-            } else if (bulletType == Global::BITMASK_BULLET2) {
+            } else if (bulletType == BULLET_TYPE::bullet2) {
                 playerHp -= bullet2;
             }
             if (playerHp < 0) {
@@ -570,17 +570,17 @@ bool GamePlay::onConcactPreSolve(cocos2d::PhysicsContact & contact) {
                 bool tempFlag = false;
                 if (body1->getTag() == Global::getMapElemTag(soil)) {
                     tempFlag = EdgeController::getInstance()->hurtSoil(sprite1, bulletType);
-                    if (body2->getCategoryBitmask() & Global::BITMASK_PLAYER) {
+                    if (tempFlag && body2->getCategoryBitmask() & Global::BITMASK_PLAYER) {
                         Global::score += EdgeController::edgeScore[MAP_ELEM_TYPE::soil];
                     }
                 } else if (body1->getTag() == Global::getMapElemTag(stock)) {
                     tempFlag = EdgeController::getInstance()->hurtStock(sprite1, bulletType);
-                    if (body2->getCategoryBitmask() & Global::BITMASK_PLAYER) {
+                    if (tempFlag && body2->getCategoryBitmask() & Global::BITMASK_PLAYER) {
                         Global::score += EdgeController::edgeScore[MAP_ELEM_TYPE::stock];
                     }
                 } else if (body1->getTag() == Global::getMapElemTag(meta)) {
                     tempFlag = EdgeController::getInstance()->hurtMeta(sprite1, bulletType);
-                    if (body2->getCategoryBitmask() & Global::BITMASK_PLAYER) {
+                    if (tempFlag && body2->getCategoryBitmask() & Global::BITMASK_PLAYER) {
                         Global::score += EdgeController::edgeScore[MAP_ELEM_TYPE::meta];
                     }
                 }
@@ -623,10 +623,19 @@ bool GamePlay::onConcactPreSolve(cocos2d::PhysicsContact & contact) {
                 bool tempFlag = false;
                 if (body2->getTag() == Global::getMapElemTag(soil)) {
                     tempFlag = EdgeController::getInstance()->hurtSoil(sprite2, bulletType);
+                    if (tempFlag && body1->getCategoryBitmask() & Global::BITMASK_PLAYER) {
+                        Global::score += EdgeController::edgeScore[MAP_ELEM_TYPE::soil];
+                    }
                 } else if (body2->getTag() == Global::getMapElemTag(stock)) {
                     tempFlag = EdgeController::getInstance()->hurtStock(sprite2, bulletType);
+                    if (tempFlag && body1->getCategoryBitmask() & Global::BITMASK_PLAYER) {
+                        Global::score += EdgeController::edgeScore[MAP_ELEM_TYPE::stock];
+                    }
                 } else if (body2->getTag() == Global::getMapElemTag(meta)) {
                     tempFlag = EdgeController::getInstance()->hurtMeta(sprite2, bulletType);
+                    if (tempFlag && body1->getCategoryBitmask() & Global::BITMASK_PLAYER) {
+                        Global::score += EdgeController::edgeScore[MAP_ELEM_TYPE::meta];
+                    }
                 }
                 if (tempFlag) {
                     // 成功摧毁障碍物则增加分数

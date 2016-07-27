@@ -20,7 +20,7 @@ cocos2d::Scene * GamePlay::createScene() {
     // 'scene' is an autorelease object
     auto scene = Scene::createWithPhysics();
     // 红色边框
-    scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
+    //scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
 
     scene->getPhysicsWorld()->setGravity(Point(0, -300)); // 设置重力
 
@@ -719,7 +719,7 @@ void GamePlay::onKeyPressed(EventKeyboard::KeyCode keycode, Event * event) {
             cocos2d::log("%f", player->getPhysicsBody()->getVelocity().y);
             if (canJump) {
                 canJump = false;
-                player->getPhysicsBody()->setVelocity(player->getPhysicsBody()->getVelocity() + Vec2(0, 225));
+                player->getPhysicsBody()->setVelocity(player->getPhysicsBody()->getVelocity() + Vec2(0, 250));
             }
             break;
         case EventKeyboard::KeyCode::KEY_ESCAPE:

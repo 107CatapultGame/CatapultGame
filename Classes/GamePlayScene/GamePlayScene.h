@@ -16,6 +16,8 @@ class GamePlay : public cocos2d::Layer {
     // implement the "static create()" method manually
     static GamePlay* create(cocos2d::PhysicsWorld* world);
 
+    virtual void onEnter();
+
 	bool onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *unused_event);
 	void onTouchEnded(cocos2d::Touch *touch, cocos2d::Event *unused_event);
 	//void update(float dt);
@@ -36,15 +38,18 @@ class GamePlay : public cocos2d::Layer {
     // scheduler
     void updateTime(float f); // 更新时间
     void updateScore(); // 更新分数
+    void updateBoundary(float f); // 更新场景杀
     void attack(float f); // 更新相互攻击
     void playerAttack(cocos2d::Vec2 touchPos);
     void updateTimeForProgressBar(float f);
     void move(float f);
+    void restoreDamage(float f); // 取消伤害加成
+    void restoreVelocity(float f); // 取消速度加成
     void playAudioEffect();
     // 监听器
     void addListener();
     // selector callback functions
-    void menuReturnCallback(cocos2d::Ref* pSender);
+    void gamePauseCallback();
     void menuReturnMainCallback(cocos2d::Ref* pSender);
     bool onConcactBegan(cocos2d::PhysicsContact& contact);
     bool onConcactPreSolve(cocos2d::PhysicsContact& contact);
@@ -63,6 +68,9 @@ class GamePlay : public cocos2d::Layer {
     cocos2d::Vec2 origin; // 起点坐标
                           // 文字Label
     cocos2d::Label * scoreLabel; // 分数
+    cocos2d::Sprite * gameItem1; // 物品1
+    cocos2d::Sprite * gameItem2; // 物品2
+    cocos2d::Sprite * gameItem3; // 物品3
     cocos2d::Vector<cocos2d::SpriteFrame*> playerAttackAnimation;
     cocos2d::Vector<cocos2d::SpriteFrame*> enemyAttackAnimation;
     int moveDirection; // 0=no, 1=left, 2=right
@@ -77,6 +85,13 @@ class GamePlay : public cocos2d::Layer {
     bool canJump;
 	cocos2d::ProgressTimer * attackProgress;
     float totalTimeForProgressBar;
+    // 基础伤害和基础速度, 道具加成效果会改变这些值
+    float baseBullet1Hurt;
+    float baseBullet2Hurt;
+    float baseVelocity;
+    // 三种道具是否被使用
+    bool gameItemUsed[3];
+    bool pause;
 };
 
 #endif // __GAME_SCENE_H__

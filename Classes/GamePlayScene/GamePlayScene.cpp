@@ -2,6 +2,7 @@
 #include "../Controllers/MapController/MapController.h"
 #include "../Controllers/EdgeController/EdgeController.h"
 #include "GamePlayScene.h"
+#include "GamePauseScene.h"
 #include "../MainpageScene.h"
 #include "../StartGameScene/SingleLevelScene.h"
 #include "../Controllers/PlayerController/progressTime.h"
@@ -11,6 +12,7 @@
 USING_NS_CC;
 
 #define ATTACK_COUNT 11 // 每11发子弹有一发是大型子弹
+#define BASE_VELOCITY 200
 
 void GamePlay::setPhysicsWorld(PhysicsWorld * world) {
     m_world = world;
@@ -24,7 +26,7 @@ cocos2d::Scene * GamePlay::createScene() {
 
     scene->getPhysicsWorld()->setGravity(Point(0, -300)); // 设置重力
 
-    // 'layer' is an autorelease object
+                                                          // 'layer' is an autorelease object
     auto layer = GamePlay::create(scene->getPhysicsWorld());
 
     // add layer as a child to scene
@@ -51,18 +53,28 @@ bool GamePlay::init(PhysicsWorld* world) {
     enemy1Hp = enemy1InitHP;
 
     addBackground(); // 添加背景
-    //this->addChild(background/* Global::LAYER_BACKGROUND*/);
-    //addMenu(); // 添加菜单
+                     //this->addChild(background/* Global::LAYER_BACKGROUND*/);
+                     //addMenu(); // 添加菜单
     addUI(); // 添加UI
     addGameItem(); // 添加游戏元素
 
-    addListener(); // 添加监听器
-    // 每分钟更新一次时间
-    //this->schedule(schedule_selector(GamePlay::updateTime), 60.0f, kRepeatForever, 0);
-    // 每秒相互攻击
+                   // 每分钟更新一次时间
+                   //this->schedule(schedule_selector(GamePlay::updateTime), 60.0f, kRepeatForever, 0);
+                   // 每秒相互攻击
     auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
     audio->preloadEffect("musics/paodan.wav");
     this->schedule(schedule_selector(GamePlay::attack), 0.5f, kRepeatForever, 2.0f);
+    this->schedule(schedule_selector(GamePlay::updateBoundary), 3.0f, kRepeatForever, 0.0f);
+
+    // 初始化基础值
+    baseBullet1Hurt = Global::getBulletHurt(BULLET_TYPE::bullet1);
+    baseBullet2Hurt = Global::getBulletHurt(BULLET_TYPE::bullet2);
+    baseVelocity = BASE_VELOCITY;
+    for (int i = 0; i < 3; i++) {
+        gameItemUsed[i] = false;
+    }
+    pause = false;
+
     return true;
 }
 
@@ -82,19 +94,19 @@ void GamePlay::addBackground() {
 }
 
 void GamePlay::addMenu() {
-    // 返回
-    auto returnItem = MenuItemImage::create(
-        "images/startgame/return_normal.png",
-        "images/startgame/return_selected.png",
-        CC_CALLBACK_1(GamePlay::menuReturnCallback, this)
-        );
-    returnItem->setPosition(Vec2(origin.x + returnItem->getContentSize().width / 2 + 20,
-        origin.x + Global::getVisibleSize().height - returnItem->getContentSize().height / 2 - 20));
+    //// 返回
+    //auto returnItem = MenuItemImage::create(
+    //    "images/startgame/return_normal.png",
+    //    "images/startgame/return_selected.png",
+    //    CC_CALLBACK_1(GamePlay::menuReturnCallback, this)
+    //    );
+    //returnItem->setPosition(Vec2(origin.x + returnItem->getContentSize().width / 2 + 20,
+    //    origin.x + Global::getVisibleSize().height - returnItem->getContentSize().height / 2 - 20));
 
-    // create menu, it's an autorelease object
-    auto menu = Menu::create(returnItem, NULL);
-    menu->setPosition(Vec2::ZERO);
-    this->addChild(menu, Global::LAYER_UI);
+    //// create menu, it's an autorelease object
+    //auto menu = Menu::create(returnItem, NULL);
+    //menu->setPosition(Vec2::ZERO);
+    //this->addChild(menu, Global::LAYER_UI);
 }
 
 void GamePlay::addUI() {
@@ -102,6 +114,21 @@ void GamePlay::addUI() {
     scoreLabel = Label::create("Score: 0", "fonts/arial.ttf", 20);
     scoreLabel->setPosition(Global::getVisibleSize() - scoreLabel->getContentSize() / 2 - Size(20, 20));
     this->addChild(scoreLabel, Global::LAYER_UI);
+
+    // 药水
+    float itemSize = 40;
+    gameItem1 = Sprite::create("images/gameplay/velocity_potion.jpg");
+    gameItem1->setScale(itemSize / gameItem1->getContentSize().width);
+    gameItem1->setPosition(origin + Vec2(itemSize * 1.5, itemSize * 0.5));
+    this->addChild(gameItem1, Global::LAYER_UI);
+    gameItem2 = Sprite::create("images/gameplay/damage_potion.jpg");
+    gameItem2->setScale(itemSize / gameItem2->getContentSize().width);
+    gameItem2->setPosition(gameItem1->getPosition() + Vec2(itemSize, 0));
+    this->addChild(gameItem2, Global::LAYER_UI);
+    gameItem3 = Sprite::create("images/gameplay/health_potion.jpg");
+    gameItem3->setScale(itemSize / gameItem3->getContentSize().width);
+    gameItem3->setPosition(gameItem2->getPosition() + Vec2(itemSize, 0));
+    this->addChild(gameItem3, Global::LAYER_UI);
 }
 
 void GamePlay::addGameItem() {
@@ -207,15 +234,15 @@ void GamePlay::addGameItem() {
     enemy->addChild(e1HpBack, Global::LAYER_GAMEPLAY);
 
     // 蓄力条
-	auto pt = progressTime::getInstance();
+    auto pt = progressTime::getInstance();
     addChild(pt, Global::LAYER_GAMEPLAY);
 
     bulletCount = 0;
 }
 
 bool GamePlay::hurt(SPRITE_TYPE spriteType, BULLET_TYPE bulletType) {
-    const float bullet1 = Global::getBulletHurt(BULLET_TYPE::bullet1);
-    const float bullet2 = Global::getBulletHurt(BULLET_TYPE::bullet2);
+    const float bullet1 = baseBullet1Hurt;
+    const float bullet2 = baseBullet2Hurt;
     switch (spriteType) {
         case SPRITE_TYPE::player:
             if (bulletType == BULLET_TYPE::bullet1) {
@@ -230,6 +257,7 @@ bool GamePlay::hurt(SPRITE_TYPE spriteType, BULLET_TYPE bulletType) {
             player_hp->runAction(ProgressTo::create(0.2f, playerHp * 100.0 / playerInitHP));
             if (playerHp == 0) {
                 player->removeFromParentAndCleanup(true);
+                player = NULL;
                 return true;
             }
             break;
@@ -247,6 +275,7 @@ bool GamePlay::hurt(SPRITE_TYPE spriteType, BULLET_TYPE bulletType) {
             if (enemy1Hp == 0) {
                 unschedule(schedule_selector(GamePlay::attack));
                 enemy->removeFromParentAndCleanup(true);
+                enemy = NULL;
                 Global::score += 500;
                 return true;
             }
@@ -297,6 +326,24 @@ void GamePlay::updateScore() {
     }
 }
 
+void GamePlay::updateBoundary(float f) {
+    if (this->player == NULL || this->enemy == NULL) {
+        this->unschedule(schedule_selector(GamePlay::updateBoundary));
+    } else {
+        if (this->player->getPosition().y < 0) {
+            this->player->removeFromParentAndCleanup(true);
+            this->player = NULL;
+            gameOver(false);
+        } else if (this->enemy->getPosition().y < 0) {
+            this->unschedule(schedule_selector(GamePlay::attack));
+            this->enemy->removeFromParentAndCleanup(true);
+            this->enemy = NULL;
+            Global::score += 500;
+            updateScore();
+        }
+    }
+}
+
 void GamePlay::attack(float f) {
     auto enAkAnimation = Animation::createWithSpriteFrames(enemyAttackAnimation, 0.1f);
     auto enemyAttackAnimate = Animate::create(enAkAnimation);
@@ -344,9 +391,9 @@ void GamePlay::playerAttack(Vec2 touchPos) {
     Vec2 bulletInitPos = player->getPosition();
     auto tempx = (!flip && dir.x > 0) ? 1 : -1;
     if (temp.x > temp.y) {
-        bulletInitPos += Vec2(tempx * catapultSize / 2, catapultSize / 2 * dir.y / dir.x);
+        bulletInitPos += Vec2(tempx * catapultSize / 2, catapultSize / 2 * temp.y / temp.x);
     } else {
-        bulletInitPos += Vec2(tempx * catapultSize / 2 * dir.x / dir.y, catapultSize / 2);
+        bulletInitPos += Vec2(tempx * catapultSize / 2 * temp.x / temp.y, catapultSize / 2);
     }
     // 速度公式 baseVelocity + argVelocity * 蓄力程度
     const float baseVelocity = 300;
@@ -405,7 +452,7 @@ void GamePlay::updateTimeForProgressBar(float f) {
 
 void GamePlay::move(float f) {
     cocos2d::log("%f,%f", player->getPositionX(), player->getPositionY());
-    const float velocity = 200;
+    const float velocity = baseVelocity;
     auto curVelocity = player->getPhysicsBody()->getVelocity();
     switch (moveDirection) {
         case 2:
@@ -433,6 +480,15 @@ void GamePlay::move(float f) {
     }
 }
 
+void GamePlay::restoreDamage(float f) {
+    baseBullet1Hurt = Global::getBulletHurt(BULLET_TYPE::bullet1);
+    baseBullet2Hurt = Global::getBulletHurt(BULLET_TYPE::bullet2);
+}
+
+void GamePlay::restoreVelocity(float f) {
+    baseVelocity = BASE_VELOCITY;
+}
+
 void GamePlay::playAudioEffect() {
     auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
     audio->playEffect("musics/paodan.wav");
@@ -458,20 +514,20 @@ void GamePlay::addListener() {
     Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(screenListener, this);
 }
 
-void GamePlay::menuReturnCallback(cocos2d::Ref * pSender) {
-    cocos2d::log("return"); // test
-    Director::getInstance()->getEventDispatcher()->removeAllEventListeners(); 
-    this->unscheduleAllSelectors(); // 停止所有调度
+void GamePlay::gamePauseCallback() {
+    Director::getInstance()->getEventDispatcher()->removeAllEventListeners();
     // 创建场景
-    auto SingleLevelScene = SingleLevel::createScene();
+    auto PauseScene = GamePause::createScene();
     // 切换场景
-    Director::getInstance()->replaceScene(TransitionSlideInL::create(0.25f, SingleLevelScene));
+    Director::getInstance()->pushScene(TransitionSlideInT::create(0.25f, PauseScene));
 }
 
 void GamePlay::menuReturnMainCallback(cocos2d::Ref * pSender) {
+    Global::game_level = GAME_INFO::none;
+    Global::score = 0;
     Director::getInstance()->getEventDispatcher()->removeAllEventListeners();
     this->unscheduleAllSelectors(); // 停止所有调度
-                                    // 创建场景
+    // 创建场景
     auto MainPageScene = Mainpage::createScene();
     // 切换场景
     Director::getInstance()->replaceScene(TransitionSlideInL::create(0.25f, MainPageScene));
@@ -506,7 +562,7 @@ bool GamePlay::onConcactBegan(cocos2d::PhysicsContact & contact) {
                 }
             }
             return false;
-        }else if (body2->getCategoryBitmask() & (Global::BITMASK_BULLET1 | Global::BITMASK_BULLET2) &&
+        } else if (body2->getCategoryBitmask() & (Global::BITMASK_BULLET1 | Global::BITMASK_BULLET2) &&
             body1->getTag() == Global::TAG_FOOTHOLD) {
             body2->removeFromWorld();
             if (sprite2) {
@@ -563,23 +619,34 @@ bool GamePlay::onConcactPreSolve(cocos2d::PhysicsContact & contact) {
             sprite2->removeFromParentAndCleanup(true);
             return true;
         }
+        bool buff;
         if (body2->getCategoryBitmask() & (Global::BITMASK_BULLET1 | Global::BITMASK_BULLET2)) {
             // 其中一个不是子弹则只移除子弹
             auto bulletType = (body2->getCategoryBitmask() & Global::BITMASK_BULLET1) ? BULLET_TYPE::bullet1 : BULLET_TYPE::bullet2;
+            switch (bulletType) {
+                case bullet1:
+                    buff = (baseBullet1Hurt / Global::getBulletHurt(bulletType)) > 1;
+                    break;
+                case bullet2:
+                    buff = (baseBullet2Hurt / Global::getBulletHurt(bulletType)) > 1;
+                    break;
+                default:
+                    break;
+            }
             if (body1->getCategoryBitmask() & Global::BITMASK_EDGE) {
                 bool tempFlag = false;
                 if (body1->getTag() == Global::getMapElemTag(soil)) {
-                    tempFlag = EdgeController::getInstance()->hurtSoil(sprite1, bulletType);
+                    tempFlag = EdgeController::getInstance()->hurtSoil(sprite1, bulletType, buff);
                     if (tempFlag && body2->getCategoryBitmask() & Global::BITMASK_PLAYER) {
                         Global::score += EdgeController::edgeScore[MAP_ELEM_TYPE::soil];
                     }
                 } else if (body1->getTag() == Global::getMapElemTag(stock)) {
-                    tempFlag = EdgeController::getInstance()->hurtStock(sprite1, bulletType);
+                    tempFlag = EdgeController::getInstance()->hurtStock(sprite1, bulletType, buff);
                     if (tempFlag && body2->getCategoryBitmask() & Global::BITMASK_PLAYER) {
                         Global::score += EdgeController::edgeScore[MAP_ELEM_TYPE::stock];
                     }
                 } else if (body1->getTag() == Global::getMapElemTag(meta)) {
-                    tempFlag = EdgeController::getInstance()->hurtMeta(sprite1, bulletType);
+                    tempFlag = EdgeController::getInstance()->hurtMeta(sprite1, bulletType, buff);
                     if (tempFlag && body2->getCategoryBitmask() & Global::BITMASK_PLAYER) {
                         Global::score += EdgeController::edgeScore[MAP_ELEM_TYPE::meta];
                     }
@@ -590,7 +657,7 @@ bool GamePlay::onConcactPreSolve(cocos2d::PhysicsContact & contact) {
                 }
             } else if (body1->getCategoryBitmask() & Global::BITMASK_FLAG) {
                 bool isEnemy = body1->getCategoryBitmask() & Global::BITMASK_ENEMY1;
-                bool tempFlag = EdgeController::getInstance()->hurtFlag(sprite1, bulletType);
+                bool tempFlag = EdgeController::getInstance()->hurtFlag(sprite1, bulletType, buff);
                 if (tempFlag) {
                     // 敌方旗帜损坏-加分
                     // 我方旗帜损坏-游戏结束
@@ -619,20 +686,30 @@ bool GamePlay::onConcactPreSolve(cocos2d::PhysicsContact & contact) {
         } else if (body1->getCategoryBitmask() & (Global::BITMASK_BULLET1 | Global::BITMASK_BULLET2)) {
             // 其中一个不是子弹则只移除子弹
             auto bulletType = (body1->getCategoryBitmask() & Global::BITMASK_BULLET1) ? BULLET_TYPE::bullet1 : BULLET_TYPE::bullet2;
+            switch (bulletType) {
+                case bullet1:
+                    buff = (baseBullet1Hurt / Global::getBulletHurt(bulletType)) > 1;
+                    break;
+                case bullet2:
+                    buff = (baseBullet2Hurt / Global::getBulletHurt(bulletType)) > 1;
+                    break;
+                default:
+                    break;
+            }
             if (body2->getCategoryBitmask() & Global::BITMASK_EDGE) {
                 bool tempFlag = false;
                 if (body2->getTag() == Global::getMapElemTag(soil)) {
-                    tempFlag = EdgeController::getInstance()->hurtSoil(sprite2, bulletType);
+                    tempFlag = EdgeController::getInstance()->hurtSoil(sprite2, bulletType, buff);
                     if (tempFlag && body1->getCategoryBitmask() & Global::BITMASK_PLAYER) {
                         Global::score += EdgeController::edgeScore[MAP_ELEM_TYPE::soil];
                     }
                 } else if (body2->getTag() == Global::getMapElemTag(stock)) {
-                    tempFlag = EdgeController::getInstance()->hurtStock(sprite2, bulletType);
+                    tempFlag = EdgeController::getInstance()->hurtStock(sprite2, bulletType, buff);
                     if (tempFlag && body1->getCategoryBitmask() & Global::BITMASK_PLAYER) {
                         Global::score += EdgeController::edgeScore[MAP_ELEM_TYPE::stock];
                     }
                 } else if (body2->getTag() == Global::getMapElemTag(meta)) {
-                    tempFlag = EdgeController::getInstance()->hurtMeta(sprite2, bulletType);
+                    tempFlag = EdgeController::getInstance()->hurtMeta(sprite2, bulletType, buff);
                     if (tempFlag && body1->getCategoryBitmask() & Global::BITMASK_PLAYER) {
                         Global::score += EdgeController::edgeScore[MAP_ELEM_TYPE::meta];
                     }
@@ -643,7 +720,7 @@ bool GamePlay::onConcactPreSolve(cocos2d::PhysicsContact & contact) {
                 }
             } else if (body2->getCategoryBitmask() & Global::BITMASK_FLAG) {
                 bool isEnemy = body2->getCategoryBitmask() & Global::BITMASK_ENEMY1;
-                bool tempFlag = EdgeController::getInstance()->hurtFlag(sprite2, bulletType);
+                bool tempFlag = EdgeController::getInstance()->hurtFlag(sprite2, bulletType, buff);
                 if (tempFlag) {
                     // 敌方旗帜损坏-加分
                     // 我方旗帜损坏-游戏结束
@@ -676,33 +753,33 @@ bool GamePlay::onConcactPreSolve(cocos2d::PhysicsContact & contact) {
 
 bool GamePlay::onConcactPostSolve(cocos2d::PhysicsContact & contact) {
     cocos2d::log("post"); // test
-    //auto body1 = contact.getShapeA()->getBody();
-    //auto body2 = contact.getShapeB()->getBody();
-    //auto sprite1 = (Sprite *)contact.getShapeA()->getBody()->getNode();
-    //auto sprite2 = (Sprite *)contact.getShapeB()->getBody()->getNode();
+                          //auto body1 = contact.getShapeA()->getBody();
+                          //auto body2 = contact.getShapeB()->getBody();
+                          //auto sprite1 = (Sprite *)contact.getShapeA()->getBody()->getNode();
+                          //auto sprite2 = (Sprite *)contact.getShapeB()->getBody()->getNode();
 
-    //// 确认两个精灵有效
-    //if (sprite1 && sprite2) {
-    //    // 若二者都是子弹则都移除
-    //    if (body1->getCategoryBitmask() & BITMASK_BULLET &&
-    //        body2->getCategoryBitmask() & BITMASK_BULLET) {
-    //        body1->removeFromWorld();
-    //        body2->removeFromWorld();
-    //        sprite1->removeFromParentAndCleanup(true);
-    //        sprite2->removeFromParentAndCleanup(true);
-    //    } else if (body1->getCategoryBitmask() & BITMASK_BODY) {
-    //        // 其中一个不是子弹则只移除子弹
-    //        body1->setVelocity(Vec2::ZERO);
-    //        body2->removeFromWorld();
-    //        sprite2->removeFromParentAndCleanup(true);
-    //        return false;
-    //    } else if (body2->getCategoryBitmask() & BITMASK_BODY) {
-    //        body2->setVelocity(Vec2::ZERO);
-    //        body1->removeFromWorld();
-    //        sprite1->removeFromParentAndCleanup(true);
-    //        return false;
-    //    }
-    //}
+                          //// 确认两个精灵有效
+                          //if (sprite1 && sprite2) {
+                          //    // 若二者都是子弹则都移除
+                          //    if (body1->getCategoryBitmask() & BITMASK_BULLET &&
+                          //        body2->getCategoryBitmask() & BITMASK_BULLET) {
+                          //        body1->removeFromWorld();
+                          //        body2->removeFromWorld();
+                          //        sprite1->removeFromParentAndCleanup(true);
+                          //        sprite2->removeFromParentAndCleanup(true);
+                          //    } else if (body1->getCategoryBitmask() & BITMASK_BODY) {
+                          //        // 其中一个不是子弹则只移除子弹
+                          //        body1->setVelocity(Vec2::ZERO);
+                          //        body2->removeFromWorld();
+                          //        sprite2->removeFromParentAndCleanup(true);
+                          //        return false;
+                          //    } else if (body2->getCategoryBitmask() & BITMASK_BODY) {
+                          //        body2->setVelocity(Vec2::ZERO);
+                          //        body1->removeFromWorld();
+                          //        sprite1->removeFromParentAndCleanup(true);
+                          //        return false;
+                          //    }
+                          //}
     return true;
 }
 
@@ -733,6 +810,12 @@ void GamePlay::onKeyPressed(EventKeyboard::KeyCode keycode, Event * event) {
             break;
         case EventKeyboard::KeyCode::KEY_ESCAPE:
             break;
+        case EventKeyboard::KeyCode::KEY_1:
+            break;
+        case EventKeyboard::KeyCode::KEY_2:
+            break;
+        case EventKeyboard::KeyCode::KEY_3:
+            break;
         default:
             break;
     }
@@ -753,23 +836,64 @@ void GamePlay::onKeyReleased(EventKeyboard::KeyCode keycode, Event * event) {
         case EventKeyboard::KeyCode::KEY_SPACE:
             break;
         case EventKeyboard::KeyCode::KEY_ESCAPE:
+            gamePauseCallback();
+            break;
+        case EventKeyboard::KeyCode::KEY_1:
+            if (!gameItemUsed[0]) {
+                // 物品未被使用
+                gameItemUsed[0] = true;
+                baseVelocity = BASE_VELOCITY * 1.5f;
+                // 5秒后恢复原样
+                scheduleOnce(schedule_selector(GamePlay::restoreVelocity), 5.0f);
+                // 图标变暗
+                gameItem1->setTexture(TextureCache::sharedTextureCache()->addImage("images/gameplay/used_potion.jpg"));
+            }
+            break;
+        case EventKeyboard::KeyCode::KEY_2:
+            if (!gameItemUsed[1]) {
+                // 物品未被使用
+                gameItemUsed[1] = true;
+                baseBullet1Hurt = baseBullet1Hurt * 1.5f;
+                baseBullet2Hurt = baseBullet2Hurt * 1.5f;
+                // 5秒后恢复原样
+                scheduleOnce(schedule_selector(GamePlay::restoreDamage), 5.0f);
+                // 图标变暗
+                gameItem2->setTexture(TextureCache::sharedTextureCache()->addImage("images/gameplay/used_potion.jpg"));
+            }
+            break;
+        case EventKeyboard::KeyCode::KEY_3:
+            if (!gameItemUsed[2]) {
+                // 物品未被使用
+                gameItemUsed[2] = true;
+                // 回满血
+                playerHp = playerInitHP;
+                /* 动画 */
+                player_hp->runAction(ProgressTo::create(0.1f, playerHp * 100.0 / playerInitHP));
+                // 图标变暗
+                gameItem3->setTexture(TextureCache::sharedTextureCache()->addImage("images/gameplay/used_potion.jpg"));
+            }
             break;
         default:
             break;
     }
 }
 
+void GamePlay::onEnter() {
+    Layer::onEnter();
+    addListener(); // 添加监听器
+}
+
 bool GamePlay::onTouchBegan(Touch *touch, Event *unused_event) {
-	//PlayerController::touchBegan(touch->getLocation());
-	Size visibleSize = Global::getVisibleSize();
+    //PlayerController::touchBegan(touch->getLocation());
+    Size visibleSize = Global::getVisibleSize();
 
-	//Vec2 touchEndedPosition = Vec2(touchPoint.x + (cameraLocation.x - visibleSize.width / 2), touchPoint.y + (cameraLocation.y - visibleSize.height / 2));
-	//archer_->aimAt(touchEndedPosition);
+    //Vec2 touchEndedPosition = Vec2(touchPoint.x + (cameraLocation.x - visibleSize.width / 2), touchPoint.y + (cameraLocation.y - visibleSize.height / 2));
+    //archer_->aimAt(touchEndedPosition);
 
-	totalTimeForProgressBar = 0;
-	progressTime::getInstance()->setProgressPercent(0);
-	this->schedule(schedule_selector(GamePlay::updateTimeForProgressBar), 0.1f);
-	return true;
+    totalTimeForProgressBar = 0;
+    progressTime::getInstance()->setProgressPercent(0);
+    this->schedule(schedule_selector(GamePlay::updateTimeForProgressBar), 0.1f);
+    return true;
 }
 
 void GamePlay::onTouchEnded(Touch *touch, Event *unused_event) {
@@ -777,6 +901,6 @@ void GamePlay::onTouchEnded(Touch *touch, Event *unused_event) {
     playerAttack(touchPos);
     progressTime::getInstance()->setProgressPercent(0);
     totalTimeForProgressBar = 0;
-	this->unschedule(schedule_selector(GamePlay::updateTimeForProgressBar));
-	// Vec2 beginPosition = archer_->getPosition();
+    this->unschedule(schedule_selector(GamePlay::updateTimeForProgressBar));
+    // Vec2 beginPosition = archer_->getPosition();
 }

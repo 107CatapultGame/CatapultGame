@@ -22,10 +22,10 @@ class EdgeController : public cocos2d::Sprite {
     void createMetaEdge();
     void createFlagEdge();
     // 伤害-若障碍物被摧毁则返回true
-    bool hurtSoil(cocos2d::Sprite * sp, BULLET_TYPE type);
-    bool hurtStock(cocos2d::Sprite * sp, BULLET_TYPE type);
-    bool hurtMeta(cocos2d::Sprite * sp, BULLET_TYPE type);
-    bool hurtFlag(cocos2d::Sprite * sp, BULLET_TYPE type);
+    bool hurtSoil(cocos2d::Sprite * sp, BULLET_TYPE type, bool buff = false);
+    bool hurtStock(cocos2d::Sprite * sp, BULLET_TYPE type, bool buff = false);
+    bool hurtMeta(cocos2d::Sprite * sp, BULLET_TYPE type, bool buff = false);
+    bool hurtFlag(cocos2d::Sprite * sp, BULLET_TYPE type, bool buff = false);
 
     // 每种障碍物的分数
     static std::map<MAP_ELEM_TYPE, int> edgeScore;

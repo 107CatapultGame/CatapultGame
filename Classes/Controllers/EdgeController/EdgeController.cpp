@@ -247,11 +247,12 @@ void EdgeController::createFlagEdge() {
     }
 }
 
-bool EdgeController::hurtSoil(cocos2d::Sprite * sp, BULLET_TYPE type) {
+bool EdgeController::hurtSoil(cocos2d::Sprite * sp, BULLET_TYPE type, bool buff) {
     int i = 0;
     for (auto soil : _soil) {
         if (sp == soil) {
-            _soilHealth[i] -= Global::getBulletHurt(type);
+            auto damage = buff ? Global::getBulletHurt(type) * 1.5f : Global::getBulletHurt(type);
+            _soilHealth[i] -= damage;
             if (_soilHealth[i] <= 0) {
                 _soilHealth[i] = 0;
                 auto size = _soilSize[i];
@@ -270,11 +271,12 @@ bool EdgeController::hurtSoil(cocos2d::Sprite * sp, BULLET_TYPE type) {
     return false;
 }
 
-bool EdgeController::hurtStock(cocos2d::Sprite * sp, BULLET_TYPE type) {
+bool EdgeController::hurtStock(cocos2d::Sprite * sp, BULLET_TYPE type, bool buff) {
     int i = 0;
     for (auto stock : _stock) {
         if (sp == stock) {
-            _stockHealth[i] -= Global::getBulletHurt(type);
+            auto damage = buff ? Global::getBulletHurt(type) * 1.5f : Global::getBulletHurt(type);
+            _stockHealth[i] -= damage;
             if (_stockHealth[i] <= 0) {
                 _stockHealth[i] = 0;
                 auto size = _stockSize[i];
@@ -293,11 +295,12 @@ bool EdgeController::hurtStock(cocos2d::Sprite * sp, BULLET_TYPE type) {
     return false;
 }
 
-bool EdgeController::hurtMeta(cocos2d::Sprite * sp, BULLET_TYPE type) {
+bool EdgeController::hurtMeta(cocos2d::Sprite * sp, BULLET_TYPE type, bool buff) {
     int i = 0;
     for (auto meta : _meta) {
         if (sp == meta) {
-            _metaHealth[i] -= Global::getBulletHurt(type);
+            auto damage = buff ? Global::getBulletHurt(type) * 1.5f : Global::getBulletHurt(type);
+            _metaHealth[i] -= damage;
             if (_metaHealth[i] <= 0) {
                 _metaHealth[i] = 0;
                 auto size = _metaSize[i];
@@ -316,11 +319,12 @@ bool EdgeController::hurtMeta(cocos2d::Sprite * sp, BULLET_TYPE type) {
     return false;
 }
 
-bool EdgeController::hurtFlag(cocos2d::Sprite * sp, BULLET_TYPE type) {
+bool EdgeController::hurtFlag(cocos2d::Sprite * sp, BULLET_TYPE type, bool buff) {
     int i = 0;
     for (auto flag : _flag) {
         if (sp == flag) {
-            _flagHealth[i] -= Global::getBulletHurt(type);
+            auto damage = buff ? Global::getBulletHurt(type) * 1.5f : Global::getBulletHurt(type);
+            _flagHealth[i] -= damage;
             if (_flagHealth[i] <= 0) {
                 _flagHealth[i] = 0;
                 auto size = _flagSize[i];

@@ -86,7 +86,7 @@ void Inventory::addUI() {
 	auto goldBg = Sprite::create("images/inventory/gold.png");
 	goldBg->setPosition(Vec2(origin.x + visibleSize.width - goldBg->getContentSize().width / 2 - 20,
 		origin.y + visibleSize.height - goldBg->getContentSize().height / 2 - 20));
-	auto goldLabel = Label::create("gold", "fonts/arial.ttf", 20);
+	auto goldLabel = Label::create("", "fonts/arial.ttf", 20);
 	goldLabel->setPosition(goldBg->getPosition());
 	this->addChild(goldBg, Global::LAYER_UI);
 	this->addChild(goldLabel, Global::LAYER_UI + 1); // 文字层比背景图层高一级

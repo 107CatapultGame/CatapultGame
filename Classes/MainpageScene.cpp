@@ -40,7 +40,7 @@ bool Mainpage::init() {
     addMenu(); // 添加菜单
     addUI(); // 添加UI
     // 播放bgm
-    CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("musics/main_bgm.mp3", true);
+    playBGM();
 
     // 每分钟更新一次时间
     this->schedule(schedule_selector(Mainpage::updateTime), 60.0f, kRepeatForever, 0);
@@ -115,7 +115,7 @@ void Mainpage::addUI() {
     auto scoreBg = Sprite::create("images/mainpage/score.png");
     scoreBg->setPosition(Vec2(origin.x + visibleSize.width - scoreBg->getContentSize().width / 2 - 20,
         visibleSize.height + origin.y - scoreBg->getContentSize().height / 2 - 120));
-    scoreLabel = Label::create("score", "fonts/arial.ttf", 20);
+    scoreLabel = Label::create("", "fonts/arial.ttf", 20);
     scoreLabel->setPosition(scoreBg->getPosition());
     this->addChild(scoreBg, Global::LAYER_UI);
     this->addChild(scoreLabel, Global::LAYER_UI + 1); // 文字层比背景图层高一级
@@ -124,7 +124,7 @@ void Mainpage::addUI() {
     auto goldBg = Sprite::create("images/mainpage/gold.png");
     goldBg->setPosition(Vec2(scoreBg->getPosition().x,
         scoreBg->getPosition().y - goldBg->getContentSize().height - verticalSpace));
-    goldLabel = Label::create("gold", "fonts/arial.ttf", 20);
+    goldLabel = Label::create("", "fonts/arial.ttf", 20);
     goldLabel->setPosition(goldBg->getPosition());
     this->addChild(goldBg, Global::LAYER_UI);
     this->addChild(goldLabel, Global::LAYER_UI + 1); // 文字层比背景图层高一级
@@ -160,7 +160,7 @@ void Mainpage::playBGM() {
 }
 
 void Mainpage::switchScene() {
-    unscheduleAllSelectors(); // 停止调度器
+    //unscheduleAllSelectors(); // 停止调度器
     //CocosDenshion::SimpleAudioEngine::getInstance()->stopBackgroundMusic();
 }
 
@@ -211,6 +211,5 @@ void Mainpage::menuSettingsCallback(cocos2d::Ref* pSender) {
 	// 创建新场景
 	auto SettingsScene = Settings::createScene();
 	// 特效切换场景
-	Director::getInstance()->replaceScene(TransitionSlideInR::create(0.25f, SettingsScene));
+    Director::getInstance()->pushScene(TransitionSlideInR::create(0.25f, SettingsScene));
 }
-

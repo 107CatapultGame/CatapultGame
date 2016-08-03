@@ -72,15 +72,6 @@ void Settings::addUI() {
 	timeLabel->setPosition(timeBg->getPosition());
 	this->addChild(timeLabel, Global::LAYER_UI + 1); // 文字层比背景图层高一级
 
-	// 金币
-	auto goldBg = Sprite::create("images/strengthen/gold.png");
-	goldBg->setPosition(Vec2(origin.x + visibleSize.width - goldBg->getContentSize().width / 2 - 20,
-		origin.y + visibleSize.height - goldBg->getContentSize().height / 2 - 20));
-	auto goldLabel = Label::create("     gold", "fonts/arial.ttf", 20);
-	goldLabel->setPosition(goldBg->getPosition());
-	this->addChild(goldBg, Global::LAYER_UI);
-	this->addChild(goldLabel, Global::LAYER_UI + 1); // 文字层比背景图层高一级
-
 	// 设置标题栏
 	auto title = Sprite::create("images/settings/title.png");
 	title->setPosition(Vec2(origin.x + visibleSize.width / 2,
@@ -104,6 +95,8 @@ void Settings::addUI() {
 	soundSlider->loadBarTexture("images/settings/slider.png");
 	soundSlider->loadSlidBallTextures("images/settings/pull.png", "images/settings/pull.png", "images/settings/pull.png");
 	soundSlider->loadProgressBarTexture("images/settings/slider.png");
+    soundSlider->setEnabled(true);
+    soundSlider->setPercent(CocosDenshion::SimpleAudioEngine::getInstance()->getEffectsVolume() * 100);
 
 	soundSlider->setPosition(Vec2(origin.x + sound->getPosition().x + soundSlider->getContentSize().width / 2 + 150,
 		origin.y + sound->getPosition().y));
@@ -116,6 +109,8 @@ void Settings::addUI() {
 	bgmslider->loadBarTexture("images/settings/slider.png");
 	bgmslider->loadSlidBallTextures("images/settings/pull.png", "images/settings/pull.png", "images/settings/pull.png");
 	bgmslider->loadProgressBarTexture("images/settings/slider.png");
+    bgmslider->setEnabled(true);
+    bgmslider->setPercent(CocosDenshion::SimpleAudioEngine::getInstance()->getBackgroundMusicVolume() * 100);
 
 	bgmslider->setPosition(Vec2(origin.x + soundSlider->getPosition().x,
 		origin.y + bgm->getPosition().y));
@@ -143,23 +138,22 @@ void Settings::bgmSliderEvent(Ref * pSender, ui::Slider::EventType type) {
 }
 
 void Settings::setBackgroundMusicVolume(float volume) {
-	cocos2d::log("volume:　　%f", volume);
-	cocos2d::log("set");
+    //CocosDenshion::SimpleAudioEngine::sharedEngine()->setBackgroundMusicVolume(volume);
 	CocosDenshion::SimpleAudioEngine::getInstance()->setBackgroundMusicVolume(volume);
 }
 
 void Settings::setEffectsVolume(float volume) {
+    //CocosDenshion::SimpleAudioEngine::sharedEngine()->setEffectsVolume(volume);
 	CocosDenshion::SimpleAudioEngine::getInstance()->setEffectsVolume(volume);
 }
 
 void Settings::menuReturnCallback(cocos2d::Ref * pSender) {
 	cocos2d::log("return"); // test
-	Global::game_mode = GAME_INFO::none;
 	this->unscheduleAllSelectors(); // 停止所有调度
 	// 创建场景
 	auto MainScene = Mainpage::createScene();
 	// 切换场景
-	Director::getInstance()->replaceScene(TransitionSlideInL::create(0.25f, MainScene));
+	Director::getInstance()->popScene();
 }
 
 void Settings::switchScene() {
